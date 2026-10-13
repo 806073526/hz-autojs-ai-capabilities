@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "runId": "dupo-cangqiong-20261001",
+  "createdAt": "2026-10-01T01:17:11.835Z",
+  "updatedAt": "2026-10-01T01:18:06.970Z",
+  "device": {
+    "id": "device_android_e3bf91f528e0bbfe",
+    "deviceName": "XIAOMI 25019PNF3C",
+    "brand": "XIAOMI",
+    "model": "25019PNF3C",
+    "release": "9",
+    "sdkInt": 28,
+    "appVersion": "5.2.5",
+    "screenWidth": 1080,
+    "screenHeight": 1920,
+    "directControlMode": "AUTO",
+    "deviceStatus": "ONLINE"
+  },
+  "app": {
+    "packageName": "com.leniu.dpcqln.ld",
+    "activity": "com.ld.sdk.LoginActivity"
+  },
+  "records": [
+    {
+      "seq": 2,
+      "capturedAt": "2026-10-01T01:18:06.970Z",
+      "label": "realm-panel-1-7-prompt",
+      "state": "REALM_PANEL",
+      "note": "境界面板：等级 4/4 已完成，主线冒险 1-7 为 0/1，前往按钮高亮",
+      "screenshot": {
+        "file": "screenshots/002-realm-panel-1-7-prompt.png",
+        "bytes": 2163845,
+        "sha256": "30567c91ae07e83c1cda3422877b369df397d36be7314b14ac1e49578f4bd0b2",
+        "region": null
+      },
+      "meta": {
+        "file": "meta/002-realm-panel-1-7-prompt.json"
+      },
+      "ocr": {
+        "file": "ocr/002-realm-panel-1-7-prompt.json",
+        "anchors": ["斗气:12318", "继续冒险提升实力吧", "冒险通关1-7", "前往"]
+      },
+      "device": {
+        "screenWidth": 1080,
+        "screenHeight": 1920,
+        "directControlMode": "AUTO"
+      },
+      "app": {
+        "packageName": "com.leniu.dpcqln.ld",
+        "activity": "com.ld.sdk.LoginActivity"
+      }
+    },
+    {
+      "seq": 12,
+      "capturedAt": "2026-09-30T14:16:26.000Z",
+      "label": "dupo-1-3-formation",
+      "state": "FORMATION",
+      "note": "归档的历史探索截图，来自早期临时目录",
+      "imported": true,
+      "originalName": "dupo-1-3-formation.png",
+      "screenshot": {
+        "file": "screenshots/012-dupo-1-3-formation.png",
+        "bytes": 213648,
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "region": null
+      },
+      "meta": null,
+      "ocr": null,
+      "device": {
+        "screenWidth": 1080,
+        "screenHeight": 1920,
+        "directControlMode": "AUTO"
+      },
+      "app": {
+        "packageName": "com.leniu.dpcqln.ld",
+        "activity": "com.ld.sdk.LoginActivity"
+      }
+    }
+  ]
+}

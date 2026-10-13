@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "taskId": "dupo-cangqiong-daily",
+  "target": {
+    "deviceId": "device_android_e3bf91f528e0bbfe",
+    "appName": "斗破苍穹",
+    "packageName": "com.leniu.dpcqln.ld",
+    "orientation": "portrait"
+  },
+  "goal": "完成可重复的斗者升级和冒险挑战，并记录状态、耗时和资源变化。",
+  "successCriteria": [
+    "从主城进入目标玩法",
+    "至少完成一次升级或挑战结算",
+    "关键状态有截图或 OCR 证据",
+    "同设备复跑结果一致"
+  ],
+  "forbiddenActions": [
+    "购买任何道具或礼包",
+    "账号切换或注销",
+    "删除角色或道具",
+    "修改设备权限或直控模式"
+  ],
+  "evidenceRequired": [
+    "入口截图",
+    "目标状态 OCR",
+    "操作脚本或探针",
+    "成功结算截图",
+    "资源或属性变化"
+  ]
+}

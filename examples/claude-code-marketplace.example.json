@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "hz-autojs-local",
+  "description": "Local marketplace for HuaZai AutoJs AI capability plugins.",
+  "owner": {
+    "name": "zjh336"
+  },
+  "plugins": [
+    {
+      "name": "hz-autojs-ai-capabilities",
+      "description": "HuaZai AutoJs Toolbox V5 device MCP and operating skills.",
+      "author": {
+        "name": "zjh336"
+      },
+      "category": "development",
+      "source": "./hz_autojs_toolbox_ai_capabilities"
+    }
+  ]
+}

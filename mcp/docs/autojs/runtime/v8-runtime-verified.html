@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>V5 运行时实证 API（Rhino）</title>
+</head>
+<body>
+<main>
+<div class="theme-hope-content">
+  <h1 id="runtime-verified-v8">V5 运行时实证 API（Rhino）</h1>
+  <p>本页收录<strong>官方离线文档没有、但在 V5 第一代 Rhino 引擎真机运行时确认存在</strong>的公开能力。页面内容来自真机探针（类型检查，不做任何实际调用），用于补足“离线文档 0 命中即不存在”在浏览器 API、按键、事件观察者、设备属性等主题上的缺口。</p>
+  <p>使用约定：本节只证明<strong>成员存在</strong>；参数细节与边界行为以实际运行结果为准。引擎内部实现（runtime.*、threads._pool、$java.* 等）不收录在本页，见知识库《高级用法》。</p>
+    <h2 id="events-observekey">events.observeKey</h2>
+    <p>开启按键事件观察。开启后才能收到 onKeyDown / onKeyUp 回调；按键事件需要在脚本结束前保持监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-onkeydown">events.onKeyDown</h2>
+    <p>注册按键按下回调：onKeyDown(keyName, callback)，keyName 取 keys.* 常量（如 "volume_up"）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-onkeyup">events.onKeyUp</h2>
+    <p>注册按键抬起回调：onKeyUp(keyName, callback)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-oncekeydown">events.onceKeyDown</h2>
+    <p>注册只触发一次的按键按下回调：onceKeyDown(keyName, callback)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-oncekeyup">events.onceKeyUp</h2>
+    <p>注册只触发一次的按键抬起回调：onceKeyUp(keyName, callback)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-removeallkeydownlisteners">events.removeAllKeyDownListeners</h2>
+    <p>移除某个按键（或全部按键）的按下监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-removeallkeyuplisteners">events.removeAllKeyUpListeners</h2>
+    <p>移除某个按键（或全部按键）的抬起监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-setkeyinterceptionenabled">events.setKeyInterceptionEnabled</h2>
+    <p>开启/关闭按键拦截：开启后系统不再收到被拦截的按键，脚本可独占处理。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-observenotification">events.observeNotification</h2>
+    <p>开启通知栏事件观察，配合 onNotification(callback) 使用。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-onnotification">events.onNotification</h2>
+    <p>注册通知回调，回调参数是通知对象（字段按系统通知结构，如包名、标题、内容）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-observetoast">events.observeToast</h2>
+    <p>开启 Toast 事件观察，配合 onToast(callback) 使用。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-ontoast">events.onToast</h2>
+    <p>注册 Toast 回调。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-observetouch">events.observeTouch</h2>
+    <p>开启触摸事件观察（仅屏幕坐标，不拦截系统触摸），配合 onTouch(callback)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-ontouch">events.onTouch</h2>
+    <p>注册触摸回调；同一脚本内可叠加多个回调。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-removealltouchlisteners">events.removeAllTouchListeners</h2>
+    <p>移除触摸事件监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-onprimaryclipchanged">events.onPrimaryClipChanged</h2>
+    <p>监听剪贴板内容变化。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-gettoucheventtimeout">events.getTouchEventTimeout</h2>
+    <p>读取触摸事件判定的超时时间（毫秒）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-settoucheventtimeout">events.setTouchEventTimeout</h2>
+    <p>设置触摸事件判定超时时间（毫秒）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-on">events.on</h2>
+    <p>通用事件注册：on(eventName, listener)。模块对象（events、sensors、images 等）共享同一套 Emitter 接口。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-once">events.once</h2>
+    <p>通用一次性事件注册：once(eventName, listener)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-emit">events.emit</h2>
+    <p>主动派发事件：emit(eventName[, ...args])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-removelistener">events.removeListener</h2>
+    <p>移除指定事件的监听函数，与 on/once 配对使用。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-removealllisteners">events.removeAllListeners</h2>
+    <p>移除某个事件（或全部事件）的监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-listeners">events.listeners</h2>
+    <p>返回指定事件的监听函数列表。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="events-listenercount">events.listenerCount</h2>
+    <p>返回指定事件的监听函数数量。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="keys-back">keys.back</h2>
+    <p>返回键键值（实测 4）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="keys-home">keys.home</h2>
+    <p>主页键键值（实测 3）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="keys-menu">keys.menu</h2>
+    <p>菜单键键值（实测 82）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="keys-volume-up">keys.volume_up</h2>
+    <p>音量上键键值（实测 24）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="keys-volume-down">keys.volume_down</h2>
+    <p>音量下键键值（实测 25）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-black">colors.BLACK</h2>
+    <p>黑色常量（实测 ARGB 值 -16777216）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-transparent">colors.TRANSPARENT</h2>
+    <p>透明色常量（实测 0）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-issimilar">colors.isSimilar</h2>
+    <p>判断两个颜色是否相似：colors.isSimilar(c1, c2, threshold, algorithm)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-luminance">colors.luminance</h2>
+    <p>计算颜色亮度。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-mapping">colors.mapping</h2>
+    <p>把颜色按通道映射为新颜色。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-hsvtocolor">colors.HSVToColor</h2>
+    <p>HSV 分量转 ARGB 颜色值。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-rgbtohsv">colors.RGBToHSV</h2>
+    <p>ARGB 颜色值转 HSV 分量。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="colors-colortohsv">colors.colorToHSV</h2>
+    <p>把颜色值转换为 HSV 三元组。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="console-settitle">console.setTitle</h2>
+    <p>设置控制台窗口标题：console.setTitle(title)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="console-print">console.print</h2>
+    <p>按原始格式输出（不追加换行处理差异）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-androidid">device.androidId</h2>
+    <p>Android ID（字符串，实测可用）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-battery">device.battery</h2>
+    <p>当前电量百分比（实测 100）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-brightness">device.brightness</h2>
+    <p>当前屏幕亮度值（0~255，实测 255）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-brightnessmode">device.brightnessMode</h2>
+    <p>亮度模式：0 手动 / 1 自动（实测 0）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-macaddress">device.macAddress</h2>
+    <p>设备 MAC 地址（字符串，实测可用）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-imei">device.IMEI</h2>
+    <p>设备 IMEI（Android 10 起受系统限制可能不可用）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-musicvolume">device.musicVolume</h2>
+    <p>当前媒体音量（实测 5）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-musicmaxvolume">device.musicMaxVolume</h2>
+    <p>媒体音量最大值（实测 15）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-alarmvolume">device.alarmVolume</h2>
+    <p>闹钟音量。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-alarmmaxvolume">device.alarmMaxVolume</h2>
+    <p>闹钟音量最大值（实测 7）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-notificationvolume">device.notificationVolume</h2>
+    <p>通知音量。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-notificationmaxvolume">device.notificationMaxVolume</h2>
+    <p>通知音量最大值。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-screenon">device.screenOn</h2>
+    <p>屏幕是否点亮（布尔值）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-charging">device.charging</h2>
+    <p>是否正在充电（布尔值）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-availmem">device.availMem</h2>
+    <p>可用内存字节数。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-totalmem">device.totalMem</h2>
+    <p>总内存字节数。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-screenorientation">device.screenOrientation</h2>
+    <p>当前屏幕方向（字符串）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-screenrotation">device.screenRotation</h2>
+    <p>当前屏幕旋转角度（0/90/180/270）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-keepawake">device.keepAwake</h2>
+    <p>保持设备唤醒。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-getscreenorientation">device.getScreenOrientation</h2>
+    <p>读取当前屏幕方向。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="device-getscreenrotation">device.getScreenRotation</h2>
+    <p>读取当前屏幕旋转角度。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-createifnotexists">files.createIfNotExists</h2>
+    <p>文件不存在时创建（含目录）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-readassets">files.readAssets</h2>
+    <p>读取脚本 assets 目录中的资源文件。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-observe">files.observe</h2>
+    <p>监听文件或目录变化：files.observe(path, callback)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-open">files.open</h2>
+    <p>打开文件输入/输出流。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-stat">files.stat</h2>
+    <p>读取文件状态（大小、修改时间等）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-dirname">files.dirname</h2>
+    <p>取路径的目录部分。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-gethumanreadablesize">files.getHumanReadableSize</h2>
+    <p>把字节数格式化为可读大小。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-getsimplifiedpath">files.getSimplifiedPath</h2>
+    <p>把路径简化为可读形式（如 /sdcard 前缀）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="files-recycle">files.recycle</h2>
+    <p>释放文件对象占用的资源。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-saveimage">images.saveImage</h2>
+    <p>把图片保存到文件：images.saveImage(image, path[, format, quality])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-stopscreencapture">images.stopScreenCapture</h2>
+    <p>停止截图并释放截图资源。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-getscreencaptureoptions">images.getScreenCaptureOptions</h2>
+    <p>读取当前截图参数。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-requestscreencaptureasync">images.requestScreenCaptureAsync</h2>
+    <p>异步申请截图权限（返回 Promise）。注意：V5 工具箱下会与主程序截图通道互抢，脚本内优先用工具箱截图落盘后再 images.read(路径)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-detectandcomputefeatures">images.detectAndComputeFeatures</h2>
+    <p>计算图片特征（SIFT/ORB 等），配合 matchFeatures 做特征匹配。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-matchfeatures">images.matchFeatures</h2>
+    <p>用特征描述子做图像匹配。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="images-opencvimporter">images.opencvImporter</h2>
+    <p>OpenCV 导入器对象，用于加载原生 OpenCV 能力。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="sqlite-open">sqlite.open</h2>
+    <p>打开 SQLite 数据库：sqlite.open(path[, options])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-settimeout">timers.setTimeout</h2>
+    <p>延时执行一次（与全局 setTimeout 对应）：timers.setTimeout(fn, delay[, ...args])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-setinterval">timers.setInterval</h2>
+    <p>周期性执行（与全局 setInterval 对应）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-cleartimeout">timers.clearTimeout</h2>
+    <p>取消 setTimeout 任务。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-clearinterval">timers.clearInterval</h2>
+    <p>取消 setInterval 任务。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-setimmediate">timers.setImmediate</h2>
+    <p>立即在当前线程队列执行一次。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-clearimmediate">timers.clearImmediate</h2>
+    <p>取消 setImmediate 任务。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-haspendingcallbacks">timers.hasPendingCallbacks</h2>
+    <p>判断当前线程是否还有未执行完的定时任务。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="timers-newtimer">timers.newTimer</h2>
+    <p>创建独立定时器对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="threads-pool">threads.pool</h2>
+    <p>创建线程池对象：threads.pool(options)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="threads-hasrunningthreads">threads.hasRunningThreads</h2>
+    <p>判断是否还有运行中的子线程。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="threads-exit">threads.exit</h2>
+    <p>退出当前线程。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="threads-allthreads">threads.allThreads</h2>
+    <p>获取当前脚本启动的全部线程。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="threads-getmainthread">threads.getMainThread</h2>
+    <p>获取主线程对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="threads-mainthread">threads.mainThread</h2>
+    <p>当前脚本的主线程对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="auto-getwindowroot">auto.getWindowRoot</h2>
+    <p>获取窗口根节点。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="auto-registerevent">auto.registerEvent</h2>
+    <p>注册无障碍事件：auto.registerEvent(eventName, callback)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="auto-registerevents">auto.registerEvents</h2>
+    <p>批量注册无障碍事件：auto.registerEvents([[eventName, callback], ...])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-click">automator.click</h2>
+    <p>无障碍点击：automator.click(x, y) 或传入节点。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-longclick">automator.longClick</h2>
+    <p>无障碍长按：automator.longClick(x, y)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-swipe">automator.swipe</h2>
+    <p>无障碍滑动：automator.swipe(x1, y1, x2, y2, duration)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-gestures">automator.gestures</h2>
+    <p>执行手势序列（同步）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-gesturesasync">automator.gesturesAsync</h2>
+    <p>执行手势序列（异步返回 Promise）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-gesture">automator.gesture</h2>
+    <p>执行单个手势（同步）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-gestureasync">automator.gestureAsync</h2>
+    <p>执行单个手势（异步）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-press">automator.press</h2>
+    <p>按键：automator.press(x, y, duration)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-scrollup">automator.scrollUp</h2>
+    <p>无障碍向上滑动。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-scrolldown">automator.scrollDown</h2>
+    <p>无障碍向下滑动。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-settext">automator.setText</h2>
+    <p>向可编辑节点写入文本。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-input">automator.input</h2>
+    <p>输入文本。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="automator-switchtoinputmethodwithid">automator.switchToInputMethodWithId</h2>
+    <p>切换到指定输入法（按包名/ID）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="sensors-on">sensors.on</h2>
+    <p>监听传感器事件：sensors.on(eventName, listener)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="sensors-once">sensors.once</h2>
+    <p>监听一次传感器事件。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="sensors-removelistener">sensors.removeListener</h2>
+    <p>移除传感器监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="sensors-removealllisteners">sensors.removeAllListeners</h2>
+    <p>移除全部传感器监听。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-layout">ui.layout</h2>
+    <p>加载并显示 UI 布局（XML 字符串或文件）：ui.layout(xml[, callback])。与 $ui.layout 同一能力。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-run">ui.run</h2>
+    <p>在 UI 线程执行代码：ui.run(fn)。子线程更新界面必须用它。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-post">ui.post</h2>
+    <p>把任务投递到 UI 线程队列：ui.post(fn[, delay])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-inflate">ui.inflate</h2>
+    <p>动态解析布局：ui.inflate(xml[, parent, attachToParent])。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-findview">ui.findView</h2>
+    <p>按 id 查找控件：ui.findView(id)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-findbyid">ui.findById</h2>
+    <p>按 id 查找控件（与 findView 同义）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-finish">ui.finish</h2>
+    <p>结束当前 UI 界面。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-registerwidget">ui.registerWidget</h2>
+    <p>注册自定义控件。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-statusbarcolor">ui.statusBarColor</h2>
+    <p>设置状态栏颜色。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-emitter">ui.emitter</h2>
+    <p>UI 模式下的运行时事件对象（仅在 ui.layout 之后可用）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="ui-icons">ui.icons</h2>
+    <p>UI 模式下的图标资源对象（仅在 ui.layout 之后可用）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="app-getpathfromuri">app.getPathFromUri</h2>
+    <p>把 content:// URI 解析为文件路径。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="app-getcurrentactivity">app.getCurrentActivity</h2>
+    <p>获取当前 Activity。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="app-sendlocalbroadcastsync">app.sendLocalBroadcastSync</h2>
+    <p>发送本应用同步广播。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="app-currentactivity">app.currentActivity</h2>
+    <p>当前 Activity 对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="app-topactivity">app.topActivity</h2>
+    <p>栈顶 Activity 对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="app-fileproviderauthority">app.fileProviderAuthority</h2>
+    <p>当前 FileProvider authority 字符串。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="media-musicplaying">media.musicPlaying</h2>
+    <p>音乐播放状态（布尔属性）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="media-musiccurrentposition">media.musicCurrentPosition</h2>
+    <p>当前播放位置（属性）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="media-musicduration">media.musicDuration</h2>
+    <p>音乐总时长（属性）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarcrypto-key">$crypto.Key</h2>
+    <p>密钥对象类型。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarcrypto-keypair">$crypto.KeyPair</h2>
+    <p>密钥对对象类型。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarnotifications-build">$notifications.build</h2>
+    <p>构建通知对象：$notifications.build(...)。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarwork-manager-addactivityintenttask">$work_manager.addActivityIntentTask</h2>
+    <p>注册 Activity Intent 任务（定时/条件触发）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarwork-manager-addbroadcastintenttask">$work_manager.addBroadcastIntentTask</h2>
+    <p>注册广播 Intent 任务。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="web-newwebsocket">web.newWebSocket</h2>
+    <p>创建 WebSocket 客户端。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="web-cookiemanager">web.cookieManager</h2>
+    <p>Cookie 管理器。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="web-webkitcookiejar">web.webkitCookieJar</h2>
+    <p>WebKit Cookie 存储对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarshell-checkaccess">$shell.checkAccess</h2>
+    <p>检查 shell 执行权限（root/普通）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarshell-isrootavailable">$shell.isRootAvailable</h2>
+    <p>判断设备是否已 root。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+    <h2 id="dollarshell-setdefaultoptions">$shell.setDefaultOptions</h2>
+    <p>设置 shell 默认选项。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机探针（2026-10-08，任务 9580d7bc03c840448d40dc10528f5ebb）确认该成员存在。</em></p>
+</div>
+</main>
+</body>
+</html>

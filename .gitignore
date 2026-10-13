@@ -1,0 +1,10 @@
+mcp/node_modules/
+mcp/dist/
+mcp/logs/
+# 真实环境变量与用户级配置：默认写在用户主目录，这里只防误放到源码目录
+.env
+config.env
+.hz-autojs-mcp/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

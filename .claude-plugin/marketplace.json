@@ -1,0 +1,19 @@
+{
+  "name": "hz-autojs-local",
+  "description": "华仔 AutoJs AI 能力包本地市场。插件与市场同目录（source 为 \".\"），供 ZCode 与 Claude Code 添加本地市场使用。",
+  "plugins": [
+    {
+      "name": "hz-autojs-ai-capabilities",
+      "source": ".",
+      "description": "华仔 AutoJs 工具箱 V5 设备 MCP、项目开发 MCP 与操作技能。",
+      "version": "1.0.13+hz.20261009112335",
+      "category": "developer-tools",
+      "keywords": [
+        "autojs",
+        "android",
+        "mcp",
+        "device-automation"
+      ]
+    }
+  ]
+}

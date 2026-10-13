@@ -1,0 +1,20 @@
+{
+  "name": "hz-autojs-local",
+  "interface": {
+    "displayName": "HuaZai AutoJs Local"
+  },
+  "plugins": [
+    {
+      "name": "hz-autojs-ai-capabilities",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

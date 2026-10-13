@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "hz-autojs-device-mcp": {
+      "command": "node",
+      "args": [
+        "./mcp/dist/device/index.js"
+      ],
+      "cwd": "."
+    },
+    "hz-autojs-project-mcp": {
+      "command": "node",
+      "args": [
+        "./mcp/dist/project/index.js"
+      ],
+      "cwd": ".",
+      "env": {
+        "HZ_MCP_CLIENT_ID": "hz-autojs-project-mcp"
+      }
+    },
+    "hz-autojs-authoring-mcp": {
+      "command": "node",
+      "args": [
+        "./mcp/dist/authoring/index.js"
+      ],
+      "cwd": ".",
+      "env": {
+        "HZ_MCP_CLIENT_ID": "hz-autojs-authoring-mcp"
+      }
+    }
+  }
+}

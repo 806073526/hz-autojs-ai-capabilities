@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "hz-autojs-device-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "E:/selfWork/hz_autojs_project/hz_autojs_toolbox_ai_capabilities/mcp/dist/index.js"
+      ],
+      "env": {
+        "HZ_MCP_TRANSPORT": "stdio",
+        "HZ_V5_BASE_URL": "http://127.0.0.1:9999",
+        "HZ_MCP_READ_ONLY": "false",
+        "HZ_MCP_ENABLE_DANGEROUS_ACTIONS": "true",
+        "HZ_MCP_USE_DIRECT_CONTROL": "false",
+        "HZ_MCP_ENABLE_DEVICE_LOCK": "true"
+      }
+    }
+  }
+}

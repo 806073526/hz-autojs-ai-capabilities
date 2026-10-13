@@ -1,0 +1,33 @@
+{
+  "name": "hz-autojs-ai-capabilities",
+  "displayName": "华仔 AutoJs AI 能力包",
+  "version": "1.0.13+hz.20261009112335",
+  "description": "华仔AutoJs_AI能力包 MCP and operating skills.",
+  "author": {
+    "name": "zjh336"
+  },
+  "keywords": [
+    "autojs",
+    "android",
+    "mcp",
+    "device-automation",
+    "hua-zai-toolbox"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.claude.mcp.json",
+  "userConfig": {
+    "v5_base_url": {
+      "type": "string",
+      "title": "V5 后端地址",
+      "description": "华仔 AutoJs 工具箱 V5 Java 后端地址。",
+      "default": "http://127.0.0.1:9999",
+      "required": true
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "只读模式",
+      "description": "开启后禁止点击、滑动、输入、脚本执行等真实设备操作。",
+      "default": false
+    }
+  }
+}

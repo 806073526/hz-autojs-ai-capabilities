@@ -1,0 +1,28 @@
+{
+  "name": "dupo-cangqiong",
+  "packageName": "com.leniu.dpcqln.ld",
+  "main": "main.js",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "abis": [
+    "armeabi-v7a",
+    "arm64-v8a"
+  ],
+  "features": {
+    "builtInOCR": "with-models",
+    "nodejs": "disabled"
+  },
+  "autoOpen": false,
+  "launchConfig": {
+    "hideLogs": false,
+    "displaySplash": false
+  },
+  "permissionConfig": {
+    "requestListOnStartup": [
+      "android.permission.WRITE_EXTERNAL_STORAGE"
+    ]
+  },
+  "ignore": [
+    "runs"
+  ]
+}

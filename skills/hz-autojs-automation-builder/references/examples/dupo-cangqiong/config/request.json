@@ -1,0 +1,1359 @@
+{
+  "schemaVersion": 1,
+  "sourceTaskId": "dupo-cangqiong-newbie-idle-panel",
+  "sourceRun": "data/exploration/dupo-cangqiong-20261001",
+  "projectTemplate": "state-machine",
+  "inputs": {
+    "stateModel": "state-model.json",
+    "evidenceIndex": "evidence-index.json",
+    "findings": "findings.md",
+    "cases": "../../cases/dupo-cangqiong-*.md"
+  },
+  "target": {
+    "packageName": "com.leniu.dpcqln.ld",
+    "deviceId": "device_android_e3bf91f528e0bbfe",
+    "baseline": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "requestedScripts": [
+    {
+      "name": "bootstrap.js",
+      "duty": "读设备模式与分辨率、加载坐标契约与状态模型、做锚点残差校验，失败则停手",
+      "readiness": "ready"
+    },
+    {
+      "name": "detect-state.js",
+      "duty": "设备侧截图 + OCR 判当前状态，输出状态 ID 与命中锚点；未识别时留帧并升级",
+      "readiness": "ready"
+    },
+    {
+      "name": "clear-popups.js",
+      "duty": "关闭活动弹窗与奖励队列，避开付费入口和中间道具图标",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "BATTLE_RESULT",
+          "IDLE_PANEL",
+          "REALM_PANEL",
+          "FACTION_DONATE"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          }
+        ],
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "点击屏幕关闭",
+            "expect": false
+          }
+        ],
+        "markers": [
+          "STATE_DETECTED"
+        ],
+        "visitsStates": [
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "BATTLE_RESULT",
+          "IDLE_PANEL",
+          "REALM_PANEL",
+          "FACTION_DONATE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "adventure-challenge.js",
+      "duty": "一关一条龙：章节地图/关卡列表 -> 挑战 -> 布阵 -> 出战（preSteps 只跑一次）-> 战斗 HUD 出来后每 6s 自动点一次右下快进(965,1560)，最多 8 次；命中「全场最佳」用命中帧复核并停，战败(变强途径)立即停手上报不盲点",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "ADVENTURE_CHAPTER",
+          "STAGE_LIST"
+        ],
+        "preSteps": [
+          {
+            "op": "tap",
+            "element": "stage_enter",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "stage_challenge",
+            "guard": false,
+            "settleMs": 1800
+          },
+          {
+            "op": "tap",
+            "element": "formation_sortie",
+            "guard": false,
+            "settleMs": 1500
+          },
+          {
+            "op": "tap",
+            "element": "formation_sortie",
+            "guard": false,
+            "settleMs": 1500
+          }
+        ],
+        "loop": {
+          "maxIterations": 8,
+          "stopWhenAnchor": "全场最佳",
+          "verifyOnStop": true,
+          "stopWhenState": [
+            "BATTLE_DEFEAT"
+          ]
+        },
+        "steps": [
+          {
+            "op": "wait",
+            "ms": 6000
+          },
+          {
+            "op": "tap",
+            "element": "battle_skip",
+            "guard": false,
+            "settleMs": 1500
+          }
+        ],
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "全场最佳"
+          }
+        ],
+        "markers": [
+          "STAGE_CLEARED"
+        ],
+        "visitsStates": [
+          "ADVENTURE_CHAPTER",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE",
+          "BATTLE_RESULT",
+          "BATTLE_DEFEAT"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "battle_confirm",
+            "guard": false,
+            "settleMs": 1600
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "nav_adventure",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "stage_enter",
+            "guard": false,
+            "settleMs": 1600
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "auto-challenge.js",
+      "duty": "连战推进：战斗页每轮「等 8s → 点右下快进(965,1560)」最多 10 轮，把当前战斗直接推到结算页；抓到「全场最佳」即用命中帧复核并停（marker STAGE_CLEARED）。快进键 OCR 读不到，只能几何定位；单脚本必须短于 3 分钟看门狗",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "BATTLE"
+        ],
+        "loop": {
+          "maxIterations": 10,
+          "stopWhenAnchor": "全场最佳",
+          "verifyOnStop": true,
+          "stopWhenState": [
+            "BATTLE_DEFEAT"
+          ]
+        },
+        "steps": [
+          {
+            "op": "wait",
+            "ms": 8000
+          },
+          {
+            "op": "tap",
+            "element": "battle_skip",
+            "guard": false,
+            "settleMs": 1500
+          }
+        ],
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "全场最佳"
+          }
+        ],
+        "markers": [
+          "STAGE_CLEARED"
+        ],
+        "visitsStates": [
+          "BATTLE",
+          "BATTLE_RESULT",
+          "BATTLE_DEFEAT"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "milestone-claim.js",
+      "duty": "章节地图右上宝箱进入里程碑面板，只处理可领取行并复核已领取状态",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "MILESTONE_PANEL"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "nav_adventure",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "milestone_chest",
+            "guard": false,
+            "settleMs": 1600
+          },
+          {
+            "op": "tap",
+            "element": "milestone_claim",
+            "guard": false,
+            "settleMs": 1800
+          },
+          {
+            "op": "wait",
+            "ms": 1000
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 800
+          }
+        ],
+        "verifyOnStep": 4,
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "STATE_DETECTED"
+        ],
+        "visitsStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "MILESTONE_PANEL",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "idle-claim.js",
+      "duty": "进入修炼石台，读取累积量，领取一次并用资源增量或倒计时验证",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "nav_adventure",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "idle_platform_entry",
+            "guard": false,
+            "settleMs": 1600
+          },
+          {
+            "op": "tap",
+            "element": "panel_claim",
+            "guard": false,
+            "settleMs": 1800
+          },
+          {
+            "op": "wait",
+            "ms": 1000
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 800
+          }
+        ],
+        "verifyOnStep": 4,
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "IDLE_CLAIMED"
+        ],
+        "visitsStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "realm-panel-claim.js",
+      "duty": "扫描任务卡三态，只处理领取，前往目标走白名单",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "MAIN_CITY",
+          "REALM_PANEL"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "realm_entry_bar",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "realm_claim",
+            "guard": false,
+            "settleMs": 1800
+          },
+          {
+            "op": "wait",
+            "ms": 1000
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 800
+          }
+        ],
+        "verifyOnStep": 3,
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "REALM_CLAIMED"
+        ],
+        "visitsStates": [
+          "MAIN_CITY",
+          "REALM_PANEL",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "hero-upgrade.js",
+      "duty": "角色升级与进阶，资源不足时停止并记录",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "HERO_DETAIL",
+          "REWARD_QUEUE"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "hero_action_button",
+            "guard": false,
+            "settleMs": 1800
+          },
+          {
+            "op": "tap",
+            "element": "hero_action_button",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 1200
+          }
+        ],
+        "verifyOnStep": 2,
+        "readings": [],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "PROMOTION_CLAIMED"
+        ],
+        "visitsStates": [
+          "HERO_DETAIL",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "training-hub-fight.js",
+      "duty": "历练·日常修行：进关卡战斗（首通按钮 战斗）；免费扫荡需先读今日免费次数（readingKey=freeSweepLeft），收费档跳过",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "MAIN_CITY",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "nav_lilian",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "training_hub_entry",
+            "guard": false,
+            "settleMs": 1600
+          },
+          {
+            "op": "tap",
+            "element": "training_tab_douqi",
+            "guard": false,
+            "settleMs": 1200
+          },
+          {
+            "op": "read",
+            "guard": false
+          },
+          {
+            "op": "tap",
+            "element": "training_sweep",
+            "guard": true,
+            "readFirst": true,
+            "guardAction": "扫荡",
+            "settleMs": 2000
+          }
+        ],
+        "readings": [
+          {
+            "key": "freeSweepLeft",
+            "pattern": "扫荡[^0-9]{0,3}(\\d+)",
+            "when": "before"
+          }
+        ],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "STAGE_CLEARED"
+        ],
+        "visitsStates": [
+          "MAIN_CITY",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "faction-donate.js",
+      "duty": "势力捐献：先读剩余免费次数与贡献数值，只走 0 消耗档，单次执行并复核剩余次数",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "FACTION_HOME",
+          "FACTION_DONATE"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "faction_donate_entry",
+            "guard": false,
+            "settleMs": 1500
+          },
+          {
+            "op": "read",
+            "guard": false
+          },
+          {
+            "op": "tap",
+            "element": "faction_donate_button",
+            "guard": true,
+            "readFirst": true,
+            "guardAction": "捐献",
+            "settleMs": 1600
+          },
+          {
+            "op": "tap",
+            "element": "faction_donate_confirm_yes",
+            "guard": false,
+            "settleMs": 2000
+          }
+        ],
+        "readings": [
+          {
+            "key": "freeDonateLeft",
+            "pattern": "剩余捐赠次数\\s*(\\d+)",
+            "when": "before"
+          }
+        ],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "DONATE_FREE_DONE"
+        ],
+        "visitsStates": [
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "xuejing-refine.js",
+      "duty": "血精凝练：先读势力贡献，≥1700 才点一次凝练，不连续点击，复核等级与剩余次数",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "NAJIE_HOME",
+          "XUEJING_PANEL"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "najie_xuejing_entry",
+            "guard": false,
+            "settleMs": 1600
+          },
+          {
+            "op": "read",
+            "guard": false
+          },
+          {
+            "op": "tap",
+            "element": "xuejing_refine",
+            "guard": true,
+            "readFirst": true,
+            "guardAction": "凝练",
+            "settleMs": 2000
+          }
+        ],
+        "readings": [
+          {
+            "key": "factionContribution",
+            "pattern": "势力贡献[:：]?\\s*(\\d+)",
+            "when": "before"
+          },
+          {
+            "key": "pityLeft",
+            "pattern": "再凝练\\s*(\\d+)\\s*次必出神话血精",
+            "when": "both"
+          }
+        ],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "神话血精"
+          }
+        ],
+        "markers": [
+          "XUEJING_REFINED"
+        ],
+        "visitsStates": [
+          "NAJIE_HOME",
+          "XUEJING_PANEL"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    },
+    {
+      "name": "quick-train-free.js",
+      "duty": "快速修炼：进入面板核对今日剩余与首次免费，仅走每日首次免费（出现 50 紫晶卡消耗即停）",
+      "readiness": "ready",
+      "spec": {
+        "startStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL"
+        ],
+        "steps": [
+          {
+            "op": "tap",
+            "element": "nav_adventure",
+            "guard": false,
+            "settleMs": 1400
+          },
+          {
+            "op": "tap",
+            "element": "idle_platform_entry",
+            "guard": false,
+            "settleMs": 1600
+          },
+          {
+            "op": "tap",
+            "element": "idle_quick_train_entry",
+            "guard": false,
+            "settleMs": 1800
+          },
+          {
+            "op": "read",
+            "guard": false
+          },
+          {
+            "op": "tap",
+            "element": "quick_train_free_button",
+            "guard": true,
+            "readFirst": true,
+            "guardAction": "快速修炼",
+            "settleMs": 2500
+          }
+        ],
+        "readings": [
+          {
+            "key": "quickTrainLeft",
+            "pattern": "今日剩余\\s*(\\d+)",
+            "when": "before"
+          }
+        ],
+        "verify": [
+          {
+            "type": "anchor",
+            "text": "喜获"
+          }
+        ],
+        "markers": [
+          "STATE_DETECTED"
+        ],
+        "visitsStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "QUICK_TRAIN",
+          "REWARD_QUEUE"
+        ],
+        "fromStates": [
+          "MAIN_CITY",
+          "ADVENTURE_CHAPTER",
+          "IDLE_PANEL",
+          "HERO_LIST",
+          "HERO_DETAIL",
+          "REALM_PANEL",
+          "TRAINING_HUB",
+          "TRAINING_STAGE_LIST",
+          "NAJIE_HOME",
+          "XUEJING_PANEL",
+          "FACTION_HOME",
+          "FACTION_DONATE",
+          "STAGE_LIST",
+          "FORMATION",
+          "BATTLE_RESULT",
+          "AUTO_CHALLENGE",
+          "REWARD_QUEUE",
+          "REWARD_POPUP",
+          "MILESTONE_PANEL",
+          "QUICK_TRAIN",
+          "LEVEL_GATE"
+        ],
+        "navSteps": [
+          {
+            "op": "tap",
+            "element": "popup_dismiss_zone",
+            "guard": false,
+            "settleMs": 900
+          },
+          {
+            "op": "back",
+            "ms": 1300
+          },
+          {
+            "op": "tap",
+            "element": "dialog_stay",
+            "guard": false,
+            "settleMs": 1000
+          },
+          {
+            "op": "tap",
+            "element": "back_arrow",
+            "guard": false,
+            "settleMs": 1300
+          },
+          {
+            "op": "tap",
+            "element": "nav_city",
+            "guard": false,
+            "settleMs": 1400
+          }
+        ],
+        "maxNavAttempts": 3
+      }
+    }
+  ],
+  "coordinateSpec": {
+    "file": "coordinate-spec.json",
+    "rule": "所有可点元素用 anchor / edge / ratio 契约表达，支持分轴 xMode / yMode，脚本内不得出现裸像素",
+    "verifiedBuckets": [
+      "16:9@1080x1920"
+    ],
+    "unverifiedBuckets": [
+      "18:9",
+      "19.5:9+",
+      "landscape"
+    ]
+  },
+  "runtimeConstraints": {
+    "aiInStableLoop": false,
+    "maxUnknownStateEscalations": 2,
+    "selfScreenshotAllowed": true,
+    "screenshotSource": "设备侧 toolManager.captureScreenshot（默认）；未知状态升级时才用宿主 device_screenshot",
+    "stateDetectionApi": "toolManager.recognizeText（MLKIT_PLUGIN）",
+    "deviceActionApi": "__toolboxTap",
+    "verifiedDeviceProbe": {
+      "taskId": "91b016e88cfd402bb8a05697de09d41e",
+      "captureScreenshot": true,
+      "recognizeText": true,
+      "ocrEngine": "MLKIT_PLUGIN",
+      "verifiedAt": "2026-10-01 夜"
+    },
+    "forbiddenTexts": [
+      "购买",
+      "充值",
+      "战令"
+    ],
+    "guardedActions": [
+      {
+        "text": "快速修炼",
+        "rule": "仅每日首次免费可用；出现 50 紫晶卡消耗时必须停止并记录"
+      },
+      {
+        "text": "捐献",
+        "rule": "只使用每日免费次数（面板剩余次数 > 0 且档位消耗为 0）；超出后消耗紫晶卡，一律跳过"
+      },
+      {
+        "text": "凝练",
+        "rule": "先读势力贡献，≥1700 才点一次，不连续点击"
+      },
+      {
+        "text": "扫荡",
+        "rule": "只走每日免费次数；收费档（20 紫晶卡/次）跳过"
+      }
+    ]
+  },
+  "verification": {
+    "replayRequired": true,
+    "evidenceDirectory": "runs/",
+    "successMarkers": [
+      "STATE_DETECTED",
+      "STAGE_CLEARED",
+      "IDLE_CLAIMED",
+      "REALM_CLAIMED",
+      "PROMOTION_CLAIMED",
+      "DONATE_FREE_DONE",
+      "XUEJING_REFINED"
+    ],
+    "evidenceRule": "每次复跑追加 manifest 记录，不覆盖历史；截图原图留在 data/exploration/<runId>/"
+  },
+  "openGaps": [
+    "第 6、7 章已全部通关；第 8 章 8-1 实测战败（2026-10-02 16:26，战败页 BATTLE_DEFEAT）——斗气 53246 / 27 级低于该关推荐战力，需先变强（心火淬炼 / 斗者培养 / 招募 / 装备）再继续",
+    "关卡列表随通关累积滚动，靠后关卡的「挑战」需要先滚动再 OCR（滚动步骤尚未进任务卡）",
+    "等级提升后的「等级礼包」付费弹窗会插进流程并吞点击；已用 forbiddenTexts 挡住付费入口，但自动关掉该弹窗的动作尚未进任务卡",
+    "已实测：自动连战的终止条件包含「战败即停」（2026-10-02 16:02 连战停止；16:26 adventure-challenge 命中 BATTLE_DEFEAT 后按 stopWhenState 立即停手，不再空转到次数上限）；次数上限/弹层中断仍未单独验证",
+    "战败后的处置只做到如实上报 + 立即停手（BATTLE_DEFEAT + 不点付费变强入口），自动\"变强\"路径未实现",
+    "历练·日常修行的「扫荡」入口不在关卡列表页（列表页只有「战斗」与播放按钮）：training-hub-fight 已能读到「今日免费扫荡：N次」（regex 需容忍繁体 免費）并走到训练页，但扫荡按钮定位仍缺证据，该任务当前判失败",
+    "领奖弹窗是美术字、OCR 不稳定（恭喜获得→「義喜获得 / 2蠡喜获釋」，点击任意位置关闭→「关美闭」）：已建模 REWARD_POPUP（子串锚点 喜获 / 点击任意位置关）并允许 UNKNOWN 时先归位一次，但单帧判断仍可能漏检（16:21 / 16:25 实测首帧命中、复帧漏检）",
+    "快速修炼每日首次免费已用完：quick-train-free 被守卫正确拒绝（GUARD_RULE_TEXT_ONLY，出现 50 紫晶卡消耗即停），未发生付费",
+    "18:9 与 19.5:9+ 分辨率分组未实测，坐标契约只声明 16:9@1080x1920 已验证",
+    "纳戒的装备 / 专属 / 斗技 / 异火四祭坛，以及势力的道场 / 双盟竞逐 / 势力试炼 / 界域争锋未进入",
+    "结算奖励队列的完整层数与顺序未完全枚举，关层仍依赖「底部空白区」经验规则"
+  ]
+}

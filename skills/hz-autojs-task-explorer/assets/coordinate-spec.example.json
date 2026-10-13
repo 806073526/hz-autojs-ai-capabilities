@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "app": "com.leniu.dpcqln.ld",
+  "appName": "斗破苍穹",
+  "baseline": {
+    "width": 1080,
+    "height": 1920,
+    "note": "所有 dx/dy/rx/ry 都以这个基准空间表达，不是设备像素"
+  },
+  "viewport": {
+    "mode": "auto",
+    "note": "auto = 运行时判定是否有黑边；stretch = 铺满全屏；fit = 等比缩放留黑边"
+  },
+  "axisModeNote": "底部导航这类元素 x 按宽度铺开(ratio)、y 贴底固定(edge)，必须分轴声明；单轴写错会在长屏或宽屏上漂移",
+  "elements": [
+    {
+      "id": "nav_city",
+      "desc": "底部导航-城市",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.0824,
+      "yMode": "edge",
+      "dy": 43
+    },
+    {
+      "id": "nav_douzhe",
+      "desc": "底部导航-斗者",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.2417,
+      "yMode": "edge",
+      "dy": 43
+    },
+    {
+      "id": "nav_najie",
+      "desc": "底部导航-纳戒",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.4028,
+      "yMode": "edge",
+      "dy": 43
+    },
+    {
+      "id": "nav_shili",
+      "desc": "底部导航-势力",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5639,
+      "yMode": "edge",
+      "dy": 43
+    },
+    {
+      "id": "nav_lilian",
+      "desc": "底部导航-历练",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.725,
+      "yMode": "edge",
+      "dy": 43
+    },
+    {
+      "id": "nav_adventure",
+      "desc": "底部导航-冒险",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.887,
+      "yMode": "edge",
+      "dy": 43
+    },
+    {
+      "id": "stage_challenge",
+      "desc": "关卡列表-挑战按钮（位置随已通关条目变化）",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "挑战" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "formation_sortie",
+      "desc": "布阵页-出战",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.662,
+      "yMode": "edge",
+      "dy": 245,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "出战" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "battle_confirm",
+      "desc": "结算页-确定",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5,
+      "yMode": "edge",
+      "dy": 185,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "确定" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "popup_dismiss_zone",
+      "desc": "奖励弹层-底部空白关闭区（避开中间道具图标）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5,
+      "yMode": "edge",
+      "dy": 250
+    },
+    {
+      "id": "panel_claim",
+      "desc": "挂机面板-领取收益",
+      "mode": "edge",
+      "edge": "bottom-right",
+      "xMode": "edge",
+      "dx": 230,
+      "yMode": "edge",
+      "dy": 275,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "领取收益" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "hero_action_button",
+      "desc": "角色详情-升级/进阶主按钮",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5,
+      "yMode": "edge",
+      "dy": 347
+    },
+    {
+      "id": "back_arrow",
+      "desc": "左下返回箭头",
+      "mode": "edge",
+      "edge": "bottom-left",
+      "xMode": "edge",
+      "dx": 115,
+      "yMode": "edge",
+      "dy": 75
+    },
+    {
+      "id": "idle_platform_entry",
+      "desc": "章节地图-修炼石台入口",
+      "mode": "ratio",
+      "xMode": "ratio",
+      "rx": 0.1574,
+      "yMode": "ratio",
+      "ry": 0.6979,
+      "note": "跟随场景布局，非贴边元素"
+    },
+    {
+      "id": "dialog_stay",
+      "desc": "退出确认-再玩会",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "再玩会" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "next_stage",
+      "desc": "胜利页-下一关",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.6685,
+      "yMode": "edge",
+      "dy": 167,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "下一关" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "auto_challenge_toggle",
+      "desc": "胜利页-开启自动挑战勾选框",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5833,
+      "yMode": "edge",
+      "dy": 85,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "开启自动挑战" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "milestone_chest",
+      "desc": "章节地图-右上里程碑宝箱",
+      "mode": "edge",
+      "edge": "top-right",
+      "xMode": "edge",
+      "dx": 125,
+      "yMode": "edge",
+      "dy": 300
+    },
+    {
+      "id": "skip_guide",
+      "desc": "教程层-跳过指引（教程层吞点击时的唯一出口）",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "跳过指引" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "quick_train_free",
+      "desc": "快速修炼面板-首次免费按钮（只在每日首次免费时点）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5231,
+      "yMode": "edge",
+      "dy": 400,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "首次免费" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "training_tab_gold",
+      "desc": "日常修行-金币页签（斜排图画按钮，OCR 读不到文字）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.4296,
+      "yMode": "edge",
+      "dy": 118,
+      "note": "2026-10-02 截图实测中心 (464,1802)；四页签同排，间距约 177px",
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "金币" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "training_tab_douqi",
+      "desc": "日常修行-斗气页签（斜排图画按钮，OCR 读不到文字）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5935,
+      "yMode": "edge",
+      "dy": 118,
+      "note": "2026-10-02 截图实测中心 (641,1802)",
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "斗气" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "training_tab_equipment",
+      "desc": "日常修行-装备页签（22 级前点击无反馈）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.7574,
+      "yMode": "edge",
+      "dy": 118,
+      "note": "探索期实测点 (818,1802) 命中页签",
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "装备" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "training_tab_skill",
+      "desc": "日常修行-斗技页签（26 级前点击无反馈，按钮呈灰色）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.9213,
+      "yMode": "edge",
+      "dy": 114,
+      "note": "探索期实测点 (995,1810) 命中页签",
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "斗技" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "training_fight",
+      "desc": "日常修行-关卡首通按钮（未通关显示 战斗，OCR 可见）",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "战斗" },
+      "offset": { "dx": 0, "dy": 0 },
+      "note": "2026-10-02 实测：斗气修行·简单1 的 战斗 中心 (915,814)；通关后该位置变 扫荡",
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "najie_xuejing_entry",
+      "desc": "纳戒首屏-血精祭坛",
+      "mode": "ratio",
+      "xMode": "ratio",
+      "rx": 0.7222,
+      "yMode": "ratio",
+      "ry": 0.599,
+      "note": "祭坛跟随场景布局，非贴边元素"
+    },
+    {
+      "id": "xuejing_refine",
+      "desc": "血精面板-凝练按钮（需先读势力贡献 ≥1700）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5,
+      "yMode": "edge",
+      "dy": 265,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "凝练" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "faction_donate_entry",
+      "desc": "势力地图-捐献入口",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "捐献" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "faction_donate_button",
+      "desc": "捐献面板-捐献按钮（只走 0 消耗档）",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.4991,
+      "yMode": "edge",
+      "dy": 407,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "捐献" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "faction_donate_confirm",
+      "desc": "捐献确认框-确定（弹窗右按钮，用锚点定位）",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "确定" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "milestone_claim",
+      "desc": "里程碑面板-一键领取",
+      "mode": "edge",
+      "edge": "bottom-center",
+      "xMode": "ratio",
+      "rx": 0.5009,
+      "yMode": "edge",
+      "dy": 240,
+      "fallback": {
+        "mode": "anchor",
+        "anchor": { "by": "ocr", "text": "一键领取" },
+        "offset": { "dx": 0, "dy": 0 }
+      }
+    },
+    {
+      "id": "realm_claim",
+      "desc": "境界面板-任务卡领取（位置随卡片变化，必须锚点定位）",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "领取" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    },
+    {
+      "id": "training_sweep",
+      "desc": "修行关卡-扫荡（只走每日免费次数，收费档跳过）",
+      "mode": "anchor",
+      "anchor": { "by": "ocr", "text": "扫荡" },
+      "offset": { "dx": 0, "dy": 0 },
+      "noFallbackReason": "动态按钮：OCR 未命中即停机（fail-closed），不用几何兜底以免误点"
+    }
+  ],
+  "guards": {
+    "forbiddenTexts": ["购买", "充值", "战令"],
+    "guardedActions": [
+      { "text": "快速修炼", "rule": "仅每日首次免费可用；出现 50 紫晶卡消耗时必须停止并记录" },
+      { "text": "捐献", "rule": "只使用每日免费次数（档位消耗为 0）；超出后消耗紫晶卡，一律跳过", "readingKey": "freeDonateLeft" },
+      { "text": "凝练", "rule": "先读势力贡献，≥1700 才执行一次，不连续点击", "readingKey": "factionContribution" },
+      { "text": "扫荡", "rule": "只走每日免费次数；收费档（20 紫晶卡/次）跳过", "readingKey": "freeSweepLeft" }
+    ],
+    "note": "forbiddenTexts 出现即跳过；guardedActions 必须先读面板数值再决定是否执行，读完不足就停在原状态"
+  },
+  "verification": {
+    "maxResidualRatioOfShortSide": 0.015,
+    "verifiedBuckets": ["16:9@1080x1920"],
+    "unverifiedBuckets": ["18:9", "19.5:9+", "landscape"]
+  }
+}

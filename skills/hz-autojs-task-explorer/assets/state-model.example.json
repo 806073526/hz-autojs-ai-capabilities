@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "states": [
+    {
+      "id": "MAIN_CITY",
+      "anchors": ["试炼之塔", "斗技台", "城市"],
+      "actions": ["open_adventure", "open_hero_list"],
+      "next": ["ADVENTURE_CHAPTER", "HERO_LIST"]
+    },
+    {
+      "id": "HERO_LIST",
+      "anchors": ["斗者", "共鸣Lv"],
+      "actions": ["open_hero_detail"],
+      "next": ["HERO_DETAIL"]
+    },
+    {
+      "id": "HERO_DETAIL",
+      "anchors": ["等级", "斗气", "升级X次"],
+      "actions": ["tap_upgrade", "back_or_dismiss"],
+      "next": ["HERO_DETAIL", "EXIT_CONFIRM"]
+    },
+    {
+      "id": "EXIT_CONFIRM",
+      "anchors": ["是否退出游戏?", "再玩会", "退出游戏"],
+      "actions": ["stay_in_game"],
+      "next": ["HERO_DETAIL", "APP_EXIT"]
+    }
+  ],
+  "unknownStatePolicy": {
+    "onUnknown": "capture_screenshot_and_ocr",
+    "beforeAction": "wait_for_stable_or_known_anchor",
+    "escalateAfterFailures": 2
+  }
+}

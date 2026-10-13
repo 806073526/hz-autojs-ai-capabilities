@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content="VuePress 2.0.0-beta.51" />
+  <meta name="theme" content="VuePress Theme Hope" />
+  <meta property="og:url" content="http://www.autojs.cc/docs/zh/v8/ui/api.html">
+  <meta property="og:site_name" content="Auto.js Pro文档">
+  <meta property="og:title" content="api文档">
+  <meta property="og:type" content="article">
+  <meta property="og:updated_time" content="2022-10-27T05:15:37.000Z">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="article:modified_time" content="2022-10-27T05:15:37.000Z">
+  <link rel="alternate" hreflang="en-us" href="http://www.autojs.cc/docs/en/zh/v8/ui/api.html">
+  <link rel="icon" href="http://www.autojs.cc/docs/favicon.ico">
+  <link rel="manifest" href="http://www.autojs.cc/docs/manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#46bd87">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>api文档 | Auto.js Pro文档</title>
+  <meta name="description" content="支持Node.js的自动化工作流JavaScript IDE">
+  <style>
+    :root {
+      --bg-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg-color: #1d2025;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-color);
+    }
+  </style>
+  <script>
+    const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+    const systemDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+      document.querySelector("html").setAttribute("data-theme", "dark");
+    }
+  </script>
+  <link rel="stylesheet" href="../../../assets/style.ae9cb182.css">
+  <link rel="modulepreload" href="../../../assets/app.6aa2b576.js">
+  <link rel="modulepreload" href="../../../assets/api.html.7a974298.js">
+  <link rel="modulepreload" href="../../../assets/_plugin-vue_export-helper.cdc0426e.js">
+  <link rel="modulepreload" href="../../../assets/api.html.7ebd198c.js">
+</head>
+
+<body>
+
+
+  <!-- Copyright � 2008. Spidersoft Ltd -->
+  <style>
+    A.applink:hover {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      background-color: #ffff00;
+      color: green;
+      text-decoration: none
+    }
+
+    A.applink {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info {
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info:hover {
+      color: green;
+      background: transparent;
+      text-decoration: underline
+    }
+  </style>
+
+
+  <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content"
+      class="skip-link sr-only">Skip to content</a><!--]-->
+    <div class="theme-container has-toc"><!--[--><!--[-->
+      <header class="navbar">
+        <div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span
+              class="icon"></span></button><!----><a href="../../../docs.html" class="brand"><img class="logo"
+              src="../../../logo.png" alt="Auto.js Pro文档"><!----><span class="site-name hide-in-pad">Auto.js
+              Pro文档</span></a><!----></div>
+        <div class="navbar-center"><!---->
+          <nav class="nav-links">
+            <div class="nav-item hide-in-mobile"><a href="../../../docs.html" class="nav-link"
+                aria-label="Auto.js Pro"><span class="icon iconfont icon-home"></span>Auto.js Pro<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../../guide/guide.html" class="nav-link" aria-label="指南"><span
+                  class="icon iconfont icon-creative"></span>指南<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../v8.html" class="nav-link active"
+                aria-label="第一代API文档"><span class="icon iconfont icon-note"></span>第一代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../../v9/v9.html" class="nav-link" aria-label="第二代API文档"><span
+                  class="icon iconfont icon-note"></span>第二代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile">
+              <div class="dropdown-wrapper"><button class="dropdown-title" type="button" aria-label="官网与相关链接"><span
+                    class="title"><span class="icon iconfont icon-discover"></span>官网与相关链接</span><span
+                    class="arrow"></span>
+                  <ul class="nav-dropdown">
+                    <li class="dropdown-item"><a href="../../../../pro.autojs.html" rel="noopener noreferrer"
+                        target="_blank" aria-label="官网与软件下载" class="nav-link"><!---->官网与软件下载<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    <li class="dropdown-item"><a href="https://qm.qq.com/q/SIQXO6Ni8K" rel="noopener noreferrer"
+                        target="_blank" aria-label="加入群聊" class="nav-link"><!---->加入群聊<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    <li class="dropdown-item"><a href="https://pd.qq.com/s/gosos5" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方频道" class="nav-link"><!---->官方频道<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                  </ul>
+                </button></div>
+            </div>
+          </nav><!---->
+        </div>
+        <div class="navbar-right"><!---->
+          <div class="nav-item">
+            <div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button"
+                aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon"
+                  viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon"
+                  style="width:1rem;height:1rem;vertical-align:middle;">
+                  <path
+                    d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z">
+                  </path>
+                </svg><!--]--><span class="arrow"></span>
+                <ul class="nav-dropdown">
+                  <li class="dropdown-item"><a href="../../../en/en.html" class="nav-link"
+                      aria-label="English"><!---->English<!----></a></li>
+                  <li class="dropdown-item"><a aria-current="page" href="api.html"
+                      class="router-link-active router-link-exact-active nav-link active"
+                      aria-label="简体中文"><!---->简体中文<!----></a></li>
+                </ul>
+              </button></div>
+          </div><!---->
+          <div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg"
+                class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon"
+                style="display:block;">
+                <path
+                  d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="dark icon" style="display:none;">
+                <path
+                  d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="light icon" style="display:none;">
+                <path
+                  d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z">
+                </path>
+              </svg></button></div>
+          <div class="search-box" role="search" data-v-f3875574><input value="" aria-label="Search" class=""
+              placeholder="Search" autocomplete="off" spellcheck="false" data-v-f3875574><!----></div><!----><button
+            class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false"
+            aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span
+                class="button-middle"></span><span class="button-bottom"></span></span></button>
+        </div>
+      </header><!----><!--]--><!---->
+      <div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div>
+      <aside class="sidebar"><!--[--><!----><!--]-->
+        <ul class="sidebar-links">
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">指南</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="../v8.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="阅读须知"><!---->阅读须知<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading active"><!----><span class="title">API文档</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="../app.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="app - 应用"><!---->app - 应用<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../base64.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="base64"><!---->base64<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../colors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="colors - 颜色"><!---->colors - 颜色<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../canvas.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="canvas - 画布"><!---->canvas - 画布<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../console.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="console - 控制台"><!---->console - 控制台<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../crypto.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="crypto - 加解密与消息摘要"><!---->crypto - 加解密与消息摘要<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../debug.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="debug - 调试工具"><!---->debug - 调试工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../device.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="device - 设备"><!---->device - 设备<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../dialogs.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="dialogs - 对话框"><!---->dialogs - 对话框<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../engines.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="engines - 脚本引擎"><!---->engines - 脚本引擎<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../events.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="events - 事件与监听"><!---->events - 事件与监听<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../floaty.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="floaty - 悬浮窗"><!---->floaty - 悬浮窗<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../files.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="files - 文件系统"><!---->files - 文件系统<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../globals.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="globals - 全局变量与函数"><!---->globals - 全局变量与函数<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../http.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="http - HTTP网络请求"><!---->http - HTTP网络请求<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../media.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="media - 多媒体"><!---->media - 多媒体<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../modules.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="module - 模块"><!---->module - 模块<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../plugins.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="plugins - 插件"><!---->plugins - 插件<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../powerManager.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="power_manager - 电源管理"><!---->power_manager - 电源管理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../sensors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="sensors - 传感器"><!---->sensors - 传感器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../shell.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="shell - Shell命令"><!---->shell - Shell命令<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../storages.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="storages - 本地存储"><!---->storages - 本地存储<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../settings.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="settings - 设置"><!---->settings - 设置<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../threads.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="threads - 多线程"><!---->threads - 多线程<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../timers.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="timers - 定时器"><!---->timers - 定时器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../timedTasks.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="work_manager - 定时与任务"><!---->work_manager - 定时与任务<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">ui - 用户界面</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><!--[--><a href="ui.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="ui入门介绍"><!---->ui入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="basic.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="基础布局与控件"><!---->基础布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="advanced.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="其他布局与控件"><!---->其他布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a aria-current="page" href="api.html"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="api文档"><!---->api文档<!----></a>
+                        <ul class="sidebar-sub-headers">
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-layout-xml"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.layout(xml)"><!---->$ui.layout(xml)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-layoutfile-xmlfile"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.layoutFile(xmlFile)"><!---->$ui.layoutFile(xmlFile)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-inflate-xml-parent-null-attachtoparent-false"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.inflate(xml[, parent = null, attachToParent = false])"><!---->$ui.inflate(xml[,
+                              parent = null, attachToParent = false])<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-registerwidget-name-widget"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.registerWidget(name, widget)"><!---->$ui.registerWidget(name,
+                              widget)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-isuithread"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.isUiThread()"><!---->$ui.isUiThread()<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-findview-id"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.findView(id)"><!---->$ui.findView(id)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-finish"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.finish()"><!---->$ui.finish()<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-setcontentview-view"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.setContentView(view)"><!---->$ui.setContentView(view)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-post-callback-delay-0"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.post(callback[, delay = 0])"><!---->$ui.post(callback[, delay =
+                              0])<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-run-callback"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.run(callback)"><!---->$ui.run(callback)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-statusbarcolor-color"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.statusBarColor(color)"><!---->$ui.statusBarColor(color)<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-useandroidresources"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.useAndroidResources()"><!---->$ui.useAndroidResources()<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-imagecache-cleardiskcache"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.imageCache.clearDiskCache()"><!---->$ui.imageCache.clearDiskCache()<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-imagecache-clearmemory"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="$ui.imageCache.clearMemory()"><!---->$ui.imageCache.clearMemory()<!----></a>
+                            <ul class="sidebar-sub-headers"></ul>
+                          </li>
+                        </ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="customWidget.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="自定义控件"><!---->自定义控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="webview.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="使用Web编写界面"><!---->使用Web编写界面<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="../util.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="util - 工具"><!---->util - 工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../webSocket.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="WebSocket"><!---->WebSocket<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../zip.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="zip - 压缩与解压"><!---->zip - 压缩与解压<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">进阶</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="../scriptingJava.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="和Java交互"><!---->和Java交互<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+        </ul><!--[--><!----><!--]-->
+      </aside><!--[-->
+      <main class="page" id="main-content"><!--[--><!---->
+        <nav class="breadcrumb disable"></nav>
+        <div class="page-title">
+          <h1><!---->api文档</h1>
+          <div class="page-info"><span class="date-info" aria-label="写作日期📅" data-balloon-pos="down"><svg
+                xmlns="http://www.w3.org/2000/svg" class="icon calendar-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="calendar icon">
+                <path
+                  d="M716.4 110.137c0-18.753-14.72-33.473-33.472-33.473-18.753 0-33.473 14.72-33.473 33.473v33.473h66.993v-33.473zm-334.87 0c0-18.753-14.72-33.473-33.473-33.473s-33.52 14.72-33.52 33.473v33.473h66.993v-33.473zm468.81 33.52H716.4v100.465c0 18.753-14.72 33.473-33.472 33.473a33.145 33.145 0 01-33.473-33.473V143.657H381.53v100.465c0 18.753-14.72 33.473-33.473 33.473a33.145 33.145 0 01-33.473-33.473V143.657H180.6A134.314 134.314 0 0046.66 277.595v535.756A134.314 134.314 0 00180.6 947.289h669.74a134.36 134.36 0 00133.94-133.938V277.595a134.314 134.314 0 00-133.94-133.938zm33.473 267.877H147.126a33.145 33.145 0 01-33.473-33.473c0-18.752 14.72-33.473 33.473-33.473h736.687c18.752 0 33.472 14.72 33.472 33.473a33.145 33.145 0 01-33.472 33.473z">
+                </path>
+              </svg><span>2022年10月27日</span>
+              <meta property="datePublished" content="2022-10-27T05:15:37.000Z">
+            </span></div>
+          <hr>
+        </div>
+        <div class="toc-place-holder">
+          <aside id="toc">
+            <div class="toc-header">此页内容</div>
+            <div class="toc-wrapper">
+              <ul class="toc-list"><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-layout-xml"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.layout(xml)</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-layoutfile-xmlfile"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.layoutFile(xmlFile)</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-inflate-xml-parent-null-attachtoparent-false"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.inflate(xml[, parent = null,
+                    attachToParent = false])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-registerwidget-name-widget"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.registerWidget(name,
+                    widget)</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-isuithread"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.isUiThread()</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-findview-id"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.findView(id)</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-finish"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.finish()</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-setcontentview-view"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.setContentView(view)</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-post-callback-delay-0"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.post(callback[, delay =
+                    0])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-run-callback"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.run(callback)</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-statusbarcolor-color"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.statusBarColor(color)</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-useandroidresources"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.useAndroidResources()</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-imagecache-cleardiskcache"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.imageCache.clearDiskCache()</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="http://www.autojs.cc/docs/zh/v8/ui/api.html#ui-imagecache-clearmemory"
+                    class="router-link-active router-link-exact-active toc-link level2">$ui.imageCache.clearMemory()</a>
+                </li><!----><!--]-->
+              </ul>
+            </div>
+          </aside>
+        </div><!---->
+        <div class="theme-hope-content">
+          <h1 id="api文档" tabindex="-1"><a class="header-anchor" href="#api文档" aria-hidden="true">#</a> api文档</h1>
+          <p>
+            本节介绍<code><span class="token property">$ui</span></code>对象的API文档，这些函数绝大部分需要在<code><span class="token string">&quot;ui&quot;</span><span class="token punctuation">;</span></code>模式下才能调用。
+          </p>
+          <h2 id="ui-layout-xml" tabindex="-1"><a class="header-anchor" href="#ui-layout-xml" aria-hidden="true">#</a>
+            $ui.layout(xml)</h2>
+          <ul>
+            <li><code><span class="token property">xml</span></code> {XML} | {string} 布局XML或者XML字符串</li>
+          </ul>
+          <p>将布局XML渲染为视图（View）对象， 并设置为当前视图。</p>
+          <h2 id="ui-layoutfile-xmlfile" tabindex="-1"><a class="header-anchor" href="#ui-layoutfile-xmlfile"
+              aria-hidden="true">#</a> $ui.layoutFile(xmlFile)</h2>
+          <ul>
+            <li><code><span class="token property">xml</span></code> {string} 布局XML文件的路径</li>
+          </ul>
+          <p>此函数和<code>ui<span class="token punctuation">.</span>layout</code>相似，只不过允许传入一个xml文件路径来渲染布局。</p>
+          <h2 id="ui-inflate-xml-parent-null-attachtoparent-false" tabindex="-1"><a class="header-anchor"
+              href="#ui-inflate-xml-parent-null-attachtoparent-false" aria-hidden="true">#</a> $ui.inflate(xml[, parent
+            = null, attachToParent = false])</h2>
+          <ul>
+            <li><code><span class="token property">xml</span></code> {string} | {XML} 布局XML或者XML字符串</li>
+            <li><code><span class="token property">parent</span></code> {View} 父视图</li>
+            <li><code><span class="token property">attachToParent</span></code> {boolean} 是否渲染的View加到父视图中，默认为false</li>
+            <li>返回 {View}</li>
+          </ul>
+          <p>
+            将布局XML渲染为视图（View）对象。如果该View将作为某个View的子View，我们建议传入<code><span class="token property">parent</span></code>参数，这样在渲染时依赖于父视图的一些布局属性能够正确应用。
+          </p>
+          <p>此函数用于动态创建、显示View。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;ui&quot;</span><span class="token punctuation">;</span>
+
+$ui<span class="token punctuation">.</span><span class="token function">layout</span><span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>linear id<span class="token operator">=</span><span class="token string">&quot;container&quot;</span><span class="token operator">&gt;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>linear<span class="token operator">&gt;</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 动态创建3个文本控件，并加到container容器中</span>
+<span class="token comment">// 这里仅为实例，实际上并不推荐这种做法，如果要展示列表，</span>
+<span class="token comment">// 使用list组件；动态创建十几个、几十个View会让界面卡顿</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">3</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> textView <span class="token operator">=</span> $ui<span class="token punctuation">.</span><span class="token function">inflate</span><span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span>text textColor<span class="token operator">=</span><span class="token string">&quot;#000000&quot;</span> textSize<span class="token operator">=</span><span class="token string">&quot;14sp&quot;</span><span class="token operator">/</span><span class="token operator">&gt;</span>
+    <span class="token punctuation">,</span> $ui<span class="token punctuation">.</span>container<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    textView<span class="token punctuation">.</span><span class="token function">attr</span><span class="token punctuation">(</span><span class="token string">&quot;text&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;文本控件&quot;</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    $ui<span class="token punctuation">.</span>container<span class="token punctuation">.</span><span class="token function">addView</span><span class="token punctuation">(</span>textView<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="ui-registerwidget-name-widget" tabindex="-1"><a class="header-anchor"
+              href="#ui-registerwidget-name-widget" aria-hidden="true">#</a> $ui.registerWidget(name, widget)</h2>
+          <ul>
+            <li><code><span class="token property">name</span></code> {string} 组件名称</li>
+            <li><code><span class="token property">widget</span></code> {Function} 组件</li>
+          </ul>
+          <p>注册一个自定义组件。参考示例-&gt;界面控件-&gt;自定义控件。</p>
+          <h2 id="ui-isuithread" tabindex="-1"><a class="header-anchor" href="#ui-isuithread" aria-hidden="true">#</a>
+            $ui.isUiThread()</h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>返回当前线程是否是UI线程。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;ui&quot;</span><span class="token punctuation">;</span>
+
+<span class="token function">log</span><span class="token punctuation">(</span>$ui<span class="token punctuation">.</span><span class="token function">isUiThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// =&gt; true</span>
+
+$threads<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">log</span><span class="token punctuation">(</span>$ui<span class="token punctuation">.</span><span class="token function">isUiThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// =&gt; false</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="ui-findview-id" tabindex="-1"><a class="header-anchor" href="#ui-findview-id" aria-hidden="true">#</a>
+            $ui.findView(id)</h2>
+          <ul>
+            <li><code><span class="token property">id</span></code> {string} View的ID</li>
+            <li>返回 {View}</li>
+          </ul>
+          <p>在当前视图中根据ID查找相应的视图对象并返回。如果当前未设置视图或找不到此ID的视图时返回<code><span class="token keyword">null</span></code>。</p>
+          <p>
+            一般我们都是通过<code>ui<span class="token punctuation">.</span>xxx</code>来获取id为xxx的控件，如果xxx是一个ui已经有的属性，就可以通过<code>$ui<span class="token punctuation">.</span><span class="token function">findView</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>来获取这个控件。
+          </p>
+          <h2 id="ui-finish" tabindex="-1"><a class="header-anchor" href="#ui-finish" aria-hidden="true">#</a>
+            $ui.finish()</h2>
+          <p>结束当前活动并销毁界面。</p>
+          <h2 id="ui-setcontentview-view" tabindex="-1"><a class="header-anchor" href="#ui-setcontentview-view"
+              aria-hidden="true">#</a> $ui.setContentView(view)</h2>
+          <ul>
+            <li><code><span class="token property">view</span></code> {View}</li>
+          </ul>
+          <p>将视图对象设置为当前视图。</p>
+          <h2 id="ui-post-callback-delay-0" tabindex="-1"><a class="header-anchor" href="#ui-post-callback-delay-0"
+              aria-hidden="true">#</a> $ui.post(callback[, delay = 0])</h2>
+          <ul>
+            <li><code><span class="token property">callback</span></code> {Function} 回调函数</li>
+            <li><code><span class="token property">delay</span></code> {number} 延迟，单位毫秒</li>
+          </ul>
+          <p>将<code><span class="token property">callback</span></code>加到UI线程的消息循环中，并延迟delay毫秒后执行（不能准确保证一定在delay毫秒后执行）。
+          </p>
+          <p>此函数可以用于UI线程中延时执行动作（sleep不能在UI线程中使用），也可以用于子线程中更新UI。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;ui&quot;</span><span class="token punctuation">;</span>
+
+ui<span class="token punctuation">.</span><span class="token function">layout</span><span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>frame<span class="token operator">&gt;</span>
+        <span class="token operator">&lt;</span>text id<span class="token operator">=</span><span class="token string">&quot;result&quot;</span><span class="token operator">/</span><span class="token operator">&gt;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>frame<span class="token operator">&gt;</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+ui<span class="token punctuation">.</span>result<span class="token punctuation">.</span><span class="token function">attr</span><span class="token punctuation">(</span><span class="token string">&quot;text&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;计算中&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 在子线程中计算1+ ... + 10000000</span>
+threads<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">1000000</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        sum <span class="token operator">+=</span> i<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 由于不能在子线程操作UI，所以要抛到UI线程执行</span>
+    ui<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        ui<span class="token punctuation">.</span>result<span class="token punctuation">.</span><span class="token function">attr</span><span class="token punctuation">(</span><span class="token string">&quot;text&quot;</span><span class="token punctuation">,</span> <span class="token function">String</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="ui-run-callback" tabindex="-1"><a class="header-anchor" href="#ui-run-callback"
+              aria-hidden="true">#</a> $ui.run(callback)</h2>
+          <ul>
+            <li><code><span class="token property">callback</span></code> {Function} 回调函数</li>
+            <li>返回 {any} callback的执行结果</li>
+          </ul>
+          <p>
+            将<code><span class="token property">callback</span></code>在UI线程中执行。如果当前已经在UI线程中，则直接执行<code><span class="token property">callback</span></code>；否则将<code><span class="token property">callback</span></code>抛到UI线程中执行（加到UI线程的消息循环的末尾），<strong>并等待callback执行结束(阻塞当前线程)</strong>。
+          </p>
+          <h2 id="ui-statusbarcolor-color" tabindex="-1"><a class="header-anchor" href="#ui-statusbarcolor-color"
+              aria-hidden="true">#</a> $ui.statusBarColor(color)</h2>
+          <ul>
+            <li><code><span class="token property">color</span></code> {string | number} 颜色</li>
+          </ul>
+          <p>设置当前界面的状态栏颜色。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;ui&quot;</span><span class="token punctuation">;</span>
+ui<span class="token punctuation">.</span><span class="token function">statusBarColor</span><span class="token punctuation">(</span><span class="token string">&quot;#000000&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="ui-useandroidresources" tabindex="-1"><a class="header-anchor" href="#ui-useandroidresources"
+              aria-hidden="true">#</a> $ui.useAndroidResources()</h2>
+          <p>
+            启用使用Android的布局(layout)、绘图(drawable)、动画(anim)、样式(style)等资源的特性。启用该特性后，在project.json中进行以下配置，就可以像写Android原生一样写界面：
+          </p>
+          <div class="language-json ext-json line-numbers-mode">
+            <pre class="language-json"><code><span class="token punctuation">{</span>
+    <span class="token comment">// ...</span>
+    androidResources<span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">&quot;resDir&quot;</span><span class="token operator">:</span> <span class="token string">&quot;res&quot;</span><span class="token punctuation">,</span>  <span class="token comment">// 资源文件夹</span>
+        <span class="token property">&quot;manifest&quot;</span><span class="token operator">:</span> <span class="token string">&quot;AndroidManifest.xml&quot;</span> <span class="token comment">// AndroidManifest文件路径</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>res文件夹通常为以下结构：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token operator">-</span> res
+    <span class="token operator">-</span> layout  <span class="token comment">// 布局资源</span>
+    <span class="token operator">-</span> drawable <span class="token comment">// 图片、形状等资源</span>
+    <span class="token operator">-</span> menu <span class="token comment">// 菜单资源</span>
+    <span class="token operator">-</span> values <span class="token comment">// 样式、字符串等资源</span>
+    <span class="token comment">// ...</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>可参考示例-&gt;复杂界面-&gt;Android原生界面。</p>
+          <h2 id="ui-imagecache-cleardiskcache" tabindex="-1"><a class="header-anchor"
+              href="#ui-imagecache-cleardiskcache" aria-hidden="true">#</a> $ui.imageCache.clearDiskCache()</h2>
+          <p><strong>[<a href="../../../../pro.autojs.html" target="_blank" rel="noopener noreferrer">Pro
+                8.8.16新增<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>]</strong></p>
+          <p>清除UI的图片文件缓存，通常是清除使用url下载的图片缓存。（比如img控件的url链接加载的图片）</p>
+          <p>此函数也可用于清除自定义启动图中的图片控件的文件缓存。</p>
+          <p>此函数和找图找色无关，并不会清除图色相关的图片内存、缓存。</p>
+          <p>此函数需要若在UI线程执行，会自动切换到IO线程异步执行，因此在UI线程执行时，函数返回不代表文件缓存已全部清理完毕。</p>
+          <h2 id="ui-imagecache-clearmemory" tabindex="-1"><a class="header-anchor" href="#ui-imagecache-clearmemory"
+              aria-hidden="true">#</a> $ui.imageCache.clearMemory()</h2>
+          <p><strong>[<a href="../../../../pro.autojs.html" target="_blank" rel="noopener noreferrer">Pro
+                8.8.16新增<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>]</strong></p>
+          <p>清除UI的图片内存缓存。</p>
+          <p>此函数和找图找色无关，并不会清除图色相关的图片内存、缓存。</p>
+        </div><!---->
+        <footer class="page-meta"><!---->
+          <div class="meta-item update-time"><span class="label">上次编辑于: </span><!----></div>
+          <div class="meta-item contributors"><span class="label">贡献者: </span><!--[--><!--[--><span class="contributor"
+              title="email: 946994919@qq.com">hyb1996</span><!--]--><!--]--></div>
+        </footer>
+        <nav class="page-nav"><a href="advanced.html" class="nav-link prev" aria-label="其他布局与控件">
+            <div class="hint"><span class="arrow left"></span>上一页</div>
+            <div class="link"><!---->其他布局与控件</div>
+          </a><a href="customWidget.html" class="nav-link next" aria-label="自定义控件">
+            <div class="hint">下一页<span class="arrow right"></span></div>
+            <div class="link">自定义控件<!----></div>
+          </a></nav><!----><!----><!--]-->
+      </main><!--]--><!----><!--]-->
+    </div><!--]--><!----><!----><!--]-->
+  </div>
+  <script type="module" src="../../../assets/app.6aa2b576.js" defer></script>
+</body>
+
+</html>

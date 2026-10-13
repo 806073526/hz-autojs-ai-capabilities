@@ -1,0 +1,47 @@
+{
+  "generator": "hz-autojs-automation-builder/generate-project.mjs",
+  "projectId": "dupo-cangqiong",
+  "generatedAt": "2026-10-04T14:16:32.563Z",
+  "sourceRun": "data/exploration/dupo-cangqiong-20261001",
+  "sourceTaskId": "dupo-cangqiong-newbie-idle-panel",
+  "inputs": {
+    "request": {
+      "file": "project-request.json",
+      "sha256": "0fb410ae528b78ac230930006fab83b39074e46869d3fa4494be30b3b7f52664"
+    },
+    "stateModel": {
+      "file": "state-model.json",
+      "sha256": "b95bf5b58f8d92d65d9d790c3202f651be5c227278c465ef935e3500749d2c81"
+    },
+    "coordinateSpec": {
+      "file": "coordinate-spec.json",
+      "sha256": "ad4d6041aad17bacb5838c9a2142db785aee51ddf502a6e7932434a3b4d91ce4"
+    },
+    "evidenceIndex": {
+      "file": "evidence-index.json",
+      "sha256": "0aa4c912edff6d432305a1d0fd68040786e0e3a99d58b2a8b15bdc6bd13d454a"
+    }
+  },
+  "taskCards": {
+    "ready": [
+      "bootstrap.js",
+      "detect-state.js",
+      "clear-popups.js",
+      "adventure-challenge.js",
+      "auto-challenge.js",
+      "milestone-claim.js",
+      "idle-claim.js",
+      "realm-panel-claim.js",
+      "hero-upgrade.js",
+      "training-hub-fight.js",
+      "faction-donate.js",
+      "xuejing-refine.js",
+      "quick-train-free.js"
+    ],
+    "partial": [],
+    "blocked": []
+  },
+  "uncoveredMarkers": [],
+  "uncoveredGuards": [],
+  "notImplemented": []
+}

@@ -1,0 +1,34 @@
+{
+  "name": "hz-autojs-ai-capabilities",
+  "version": "1.0.13+hz.20261009112335",
+  "description": "华仔AutoJs_AI能力包插件",
+  "author": {
+    "name": "zjh336"
+  },
+  "keywords": [
+    "autojs",
+    "android",
+    "mcp",
+    "device-automation",
+    "hua-zai-toolbox"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "华仔AutoJs_AI能力包",
+    "shortDescription": "AutoJs V5 设备 MCP、项目开发 MCP、教程录制作者 MCP 与操作技能。",
+    "longDescription": "为华仔 AutoJs 工具箱 V5 提供 Codex 可用的设备 MCP、项目开发 MCP 与教程录制作者 MCP（默认关闭，`HZ_MCP_ENABLE_TUTORIAL_TOOLS=true` 开启）工具、AutoJs 脚本编写规则、设备操作规则、项目同步与部署规则、任务探索规则、自动化项目生成规则、检测模型训练与端上部署规则和随包离线文档。默认通过 stdio 启动 MCP，并连接本机 V5 后端 http://127.0.0.1:9999。",
+    "developerName": "zjh336",
+    "category": "Engineering",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "查看在线设备",
+      "生成并运行AutoJs调试脚本"
+    ]
+  }
+}
+

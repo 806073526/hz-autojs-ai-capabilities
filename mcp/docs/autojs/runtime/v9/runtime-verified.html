@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>V5 运行时实证 API（Node.js）</title>
+</head>
+<body>
+<main>
+<div class="theme-hope-content">
+  <h1 id="runtime-verified-v9">V5 运行时实证 API（Node.js）</h1>
+  <p>本页收录 Node（第二代）入口下经真机探针确认存在、但官方 TypeDoc 页未覆盖的能力。Node 入口指文件名以 <code>.node.js</code> 结尾，或脚本首行为 <code>"nodejs";</code>；运行时为内置 Node 16.14.0。</p>
+  <p>只证明成员存在，参数细节以实际运行结果为准。</p>
+    <h2 id="dollarautojs-keeprunning">$autojs.keepRunning</h2>
+    <p>保持 Node 脚本进程存活（等价于常驻脚本）：$autojs.keepRunning()。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarautojs-cancelkeeprunning">$autojs.cancelKeepRunning</h2>
+    <p>取消保持存活，让脚本可以正常退出。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarautojs-androidcontext">$autojs.androidContext</h2>
+    <p>Android Context 对象，用于取系统服务。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarautojs-application">$autojs.application</h2>
+    <p>Application 对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarautojs-isreleasemode">$autojs.isReleaseMode</h2>
+    <p>是否处于发布模式。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarautojs-requireautojsversion">$autojs.requireAutoJsVersion</h2>
+    <p>声明脚本要求的 AutoJs 版本下限。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarautojs-properties">$autojs.properties</h2>
+    <p>AutoJs 运行时属性表。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-findclass">$java.findClass</h2>
+    <p>按类名查找 Java 类（内部类用 $ 分隔）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-defineclass">$java.defineClass</h2>
+    <p>用 JS 定义 Java 类（继承或实现接口）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxint">$java.boxInt</h2>
+    <p>把 JS 数字装箱为 Integer。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxlong">$java.boxLong</h2>
+    <p>把 JS 数字装箱为 Long。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxshort">$java.boxShort</h2>
+    <p>把 JS 数字装箱为 Short。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxbyte">$java.boxByte</h2>
+    <p>把 JS 数字装箱为 Byte。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxfloat">$java.boxFloat</h2>
+    <p>把 JS 数字装箱为 Float。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxdouble">$java.boxDouble</h2>
+    <p>把 JS 数字装箱为 Double。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxboolean">$java.boxBoolean</h2>
+    <p>把 JS 布尔值装箱为 Boolean。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-boxchar">$java.boxChar</h2>
+    <p>把 JS 字符串装箱为 Character。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-setthreadmode">$java.setThreadMode</h2>
+    <p>指定对象方法的默认线程模式（如 io / ui）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-setdefaultthreadmode">$java.setDefaultThreadMode</h2>
+    <p>设置默认线程模式。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-getfield">$java.getField</h2>
+    <p>读取 Java 对象的字段。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-setfield">$java.setField</h2>
+    <p>写入 Java 对象的字段。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-create">$java.create</h2>
+    <p>创建 Java 对象（异步/包装形式）。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-createsync">$java.createSync</h2>
+    <p>同步创建 Java 对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-wrap">$java.wrap</h2>
+    <p>把 Java 对象包装为 JS 代理。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-classname">$java.className</h2>
+    <p>获取对象的 Java 类名。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-constructors">$java.constructors</h2>
+    <p>获取类的构造方法列表。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-prototypes">$java.prototypes</h2>
+    <p>获取类的原型方法列表。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-loaddex">$java.loadDex</h2>
+    <p>加载 dex 文件。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="dollarjava-loadjar">$java.loadJar</h2>
+    <p>加载 jar 文件。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-table">console.table</h2>
+    <p>以表格形式输出数组或对象。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-group">console.group</h2>
+    <p>开始一个日志分组。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-groupend">console.groupEnd</h2>
+    <p>结束当前日志分组。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-debug">console.debug</h2>
+    <p>输出 debug 级别日志。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-dir">console.dir</h2>
+    <p>以对象形式展开输出。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-timelog">console.timeLog</h2>
+    <p>输出某个计时器的中间耗时。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-count">console.count</h2>
+    <p>统计某个标签被调用的次数。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="console-countreset">console.countReset</h2>
+    <p>重置标签计数。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="util-promisify">util.promisify</h2>
+    <p>把回调风格函数转为 Promise 风格。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="util-inspect">util.inspect</h2>
+    <p>把对象格式化为可读字符串。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+    <h2 id="util-format">util.format</h2>
+    <p>按占位符格式化字符串。</p>
+    <p><em>运行时实证：V5 5.2.12 / Android 9 真机 Node 引擎探针（2026-10-08，任务 87500ac72720452cbf6c1689f43733a4）确认该成员存在。</em></p>
+</div>
+</main>
+</body>
+</html>

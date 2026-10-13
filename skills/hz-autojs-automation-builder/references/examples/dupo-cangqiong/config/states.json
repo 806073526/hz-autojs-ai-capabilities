@@ -1,0 +1,795 @@
+{
+  "schemaVersion": 1,
+  "states": [
+    {
+      "id": "ACTIVITY_POPUP",
+      "confidence": "verified",
+      "anchors": [
+        "优惠券秒杀",
+        "常规奖励",
+        "进阶奖励"
+      ],
+      "actions": [
+        "close_popup"
+      ],
+      "next": [
+        "SERVER_SELECT",
+        "MAIN_CITY"
+      ],
+      "notes": "右上角关闭；不要点奖励区"
+    },
+    {
+      "id": "SERVER_SELECT",
+      "confidence": "verified",
+      "anchors": [
+        "进入游戏",
+        "协议勾选"
+      ],
+      "actions": [
+        "enter_game"
+      ],
+      "next": [
+        "STORY_CUTSCENE",
+        "MAIN_CITY"
+      ]
+    },
+    {
+      "id": "STORY_CUTSCENE",
+      "confidence": "verified",
+      "anchors": [
+        "跳过剧情"
+      ],
+      "actions": [
+        "skip_story"
+      ],
+      "next": [
+        "MAIN_CITY"
+      ]
+    },
+    {
+      "id": "TUTORIAL_GUIDE",
+      "confidence": "verified",
+      "anchors": [
+        "手指图标",
+        "提示文字",
+        "唯一高亮目标"
+      ],
+      "actions": [
+        "follow_highlighted_target"
+      ],
+      "next": [
+        "MAIN_CITY",
+        "ADVENTURE_CHAPTER",
+        "REALM_PANEL"
+      ],
+      "notes": "输入被过滤，非高亮目标点击会被吞；绕行必然失败"
+    },
+    {
+      "id": "MAIN_CITY",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "试炼之塔",
+          "weight": 3,
+          "required": true,
+          "exclusive": true
+        },
+        {
+          "text": "斗技台",
+          "weight": 1
+        },
+        {
+          "text": "星辰台",
+          "weight": 1
+        },
+        {
+          "text": "城市",
+          "weight": 0.5
+        },
+        {
+          "text": "冒险",
+          "weight": 0.5
+        },
+        {
+          "text": "纳戒",
+          "weight": 0.5
+        },
+        {
+          "text": "势力",
+          "weight": 0.5
+        },
+        {
+          "text": "历练",
+          "weight": 0.5
+        }
+      ],
+      "notes": "2026-10-02 真机实测：底部六导航文案（城市/冒险/纳戒/势力/历练）在章节地图、战斗页、结算页同样渲染，不能作为主城判定依据。主城必须命中城市场景独有锚点「试炼之塔」（required+exclusive）；其余锚点降权为佐证。修复前 detect-state 在章节地图误报 MAIN_CITY（score=5，命中城市/冒险/纳戒/势力/历练）。",
+      "actions": [
+        "open_adventure",
+        "open_hero_list",
+        "open_idle_platform",
+        "open_realm_panel"
+      ],
+      "next": [
+        "ADVENTURE_CHAPTER",
+        "HERO_LIST",
+        "IDLE_PANEL",
+        "REALM_PANEL"
+      ]
+    },
+    {
+      "id": "ADVENTURE_CHAPTER",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "次日8点可领",
+          "weight": 4
+        },
+        {
+          "text": "第1章",
+          "weight": 1
+        },
+        {
+          "text": "开始挑战",
+          "weight": 1
+        },
+        {
+          "text": "章节旗子",
+          "kind": "visual",
+          "weight": 1
+        }
+      ],
+      "notes": "2026-10-02 真机实测：本页渲染底部六导航，且设备 OCR 把「开始挑战」读成「牙始紀」(0.27)，不能作为唯一判据；章节地图专属锚点「次日8点可领」（下一章未解锁提示，6/6 条地图证据命中）权重 4，「第1章」为兜底。",
+      "actions": [
+        "open_stage_list"
+      ],
+      "next": [
+        "STAGE_LIST"
+      ]
+    },
+    {
+      "id": "STAGE_LIST",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "挑战",
+          "weight": 2
+        },
+        {
+          "text": "通关上一关后解锁",
+          "weight": 1
+        },
+        {
+          "text": "1-1",
+          "weight": 0.5
+        },
+        {
+          "text": "1-6",
+          "weight": 0.5
+        },
+        {
+          "text": "1-7",
+          "weight": 0.5
+        },
+        {
+          "text": "已通关",
+          "weight": 1
+        }
+      ],
+      "actions": [
+        "tap_challenge"
+      ],
+      "next": [
+        "FORMATION"
+      ],
+      "notes": "挑战按钮位置随已通关条目与滚动变化，必须 OCR 动态定位"
+    },
+    {
+      "id": "FORMATION",
+      "confidence": "verified",
+      "anchors": [
+        "上阵",
+        "一键上阵",
+        "出战"
+      ],
+      "actions": [
+        "auto_formation",
+        "tap_sortie"
+      ],
+      "next": [
+        "BATTLE"
+      ],
+      "notes": "真机实测 OCR：「上阵人數:6/6」「一键止阵」「出战」；'上阵'与'出战'稳定命中，'一键上阵'保留作冗余。本页含提示语「斗者出手顺序由位置决定」，故主城锚点不得使用'斗者'这类通用词"
+    },
+    {
+      "id": "BATTLE",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "X2",
+          "weight": 3
+        },
+        {
+          "text": "X1",
+          "weight": 3
+        },
+        {
+          "text": "回合",
+          "weight": 3
+        },
+        {
+          "text": "总伤害",
+          "weight": 3
+        },
+        {
+          "text": "血条",
+          "kind": "visual",
+          "weight": 1
+        }
+      ],
+      "notes": "动画期间不要用 waitStable 截图",
+      "actions": [
+        "wait_for_settlement"
+      ],
+      "next": [
+        "BATTLE_RESULT"
+      ]
+    },
+    {
+      "id": "BATTLE_RESULT",
+      "confidence": "verified",
+      "anchors": [
+        "胜",
+        "全场最佳",
+        "获得奖励",
+        "确定"
+      ],
+      "actions": [
+        "tap_confirm"
+      ],
+      "next": [
+        "REWARD_QUEUE"
+      ]
+    },
+    {
+      "id": "REWARD_POPUP",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "点击任意位置关",
+          "weight": 3
+        },
+        {
+          "text": "喜获",
+          "weight": 3
+        }
+      ],
+      "minScore": 3,
+      "actions": [
+        "dismiss_popup"
+      ],
+      "next": [
+        "MAIN_CITY",
+        "MILESTONE_PANEL",
+        "IDLE_PANEL",
+        "REALM_PANEL",
+        "QUICK_TRAIN",
+        "BATTLE_RESULT",
+        "HERO_DETAIL"
+      ],
+      "notes": "通用领奖弹窗（恭喜获得 + 点击任意位置关闭）。真机实测 2026-10-02：该弹窗不被识别时会让所有任务判 UNKNOWN → STATE_NOT_ALLOWED 直接失败；处理方式=点底部空白区关闭，不要点中间道具图标"
+    },
+    {
+      "id": "BATTLE_DEFEAT",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "变强途径",
+          "weight": 3
+        },
+        {
+          "text": "返回战斗",
+          "weight": 2
+        },
+        {
+          "text": "败",
+          "weight": 1
+        }
+      ],
+      "actions": [
+        "acknowledge_defeat"
+      ],
+      "next": [
+        "STAGE_LIST",
+        "MAIN_CITY"
+      ],
+      "notes": "2026-10-02 16:02 真机实测：关卡打不过时出现「败 + 变强途径（心火淬炼/斗者培养/招募/装备）+ 确定 / 返回战斗」。这是自动连战的终止条件（战败即停），本状态只建模用于如实上报，不自动点任何\"变强\"付费入口。"
+    },
+    {
+      "id": "REWARD_QUEUE",
+      "confidence": "verified",
+      "anchors": [
+        "等级提升",
+        "升级奖励",
+        "点击屏幕关闭",
+        "道具说明"
+      ],
+      "actions": [
+        "dismiss_overlay"
+      ],
+      "next": [
+        "REWARD_QUEUE",
+        "MAIN_CITY",
+        "STAGE_LIST"
+      ],
+      "notes": "关层点底部提示区或空白区，避开中间道具图标，否则会造成 A↔B 循环"
+    },
+    {
+      "id": "IDLE_PANEL",
+      "confidence": "verified",
+      "anchors": [
+        "修炼石台",
+        "奖励可领取",
+        "领取收益",
+        "x/M 收益率",
+        "倒计时"
+      ],
+      "actions": [
+        "read_accumulation",
+        "tap_claim"
+      ],
+      "next": [
+        "REWARD_QUEUE",
+        "IDLE_PANEL"
+      ],
+      "notes": "面板同时存在快速修炼等付费/消耗入口，只走领取路径"
+    },
+    {
+      "id": "HERO_LIST",
+      "confidence": "verified",
+      "anchors": [
+        {
+          "text": "共鸣",
+          "weight": 3
+        },
+        {
+          "text": "图鉴绘卷",
+          "weight": 2
+        },
+        {
+          "text": "斗者",
+          "weight": 0.5
+        },
+        {
+          "text": "角色卡片",
+          "kind": "visual",
+          "weight": 1
+        }
+      ],
+      "minScore": 5,
+      "notes": "2026-10-02 真机实测：战斗页/章节地图底部导航同样渲染「斗者」，旧锚点把战斗页误判为 HERO_LIST（run-1790924987689，hits=[斗者] score=1）；装备页也会出现「品质共鸣」字样（15:50 实测 hits=[共鸣] score=3）。改为「共鸣」+「图鉴绘卷」双主锚点并设 minScore=5：只有真角色列表（共鸣 3 + 图鉴绘卷 2）才够分。",
+      "actions": [
+        "open_hero_detail"
+      ],
+      "next": [
+        "HERO_DETAIL"
+      ]
+    },
+    {
+      "id": "HERO_DETAIL",
+      "confidence": "verified",
+      "anchors": [
+        "等级",
+        "斗气",
+        "升级X次",
+        "斗者进阶"
+      ],
+      "actions": [
+        "tap_upgrade",
+        "tap_advance"
+      ],
+      "next": [
+        "HERO_DETAIL",
+        "REWARD_QUEUE"
+      ],
+      "notes": "升级按钮必须用 OCR bounds 校正，目测会偏上约 300 像素"
+    },
+    {
+      "id": "REALM_PANEL",
+      "confidence": "verified",
+      "anchors": [
+        "境界",
+        "等级提升",
+        "冒险:主线冒险",
+        "已完成",
+        "前往",
+        "领取"
+      ],
+      "actions": [
+        "scan_cards",
+        "tap_claim",
+        "tap_go"
+      ],
+      "next": [
+        "REALM_PANEL",
+        "REWARD_QUEUE",
+        "STAGE_LIST"
+      ],
+      "notes": "任务卡三态：领取 / 已完成 / 前往；前往目标页必须显式白名单"
+    },
+    {
+      "id": "EXIT_CONFIRM",
+      "confidence": "verified",
+      "anchors": [
+        "是否退出游戏?",
+        "再玩会",
+        "退出游戏"
+      ],
+      "actions": [
+        "stay_in_game"
+      ],
+      "next": [
+        "MAIN_CITY"
+      ],
+      "notes": "恢复动作是点再玩会，不要点退出游戏"
+    },
+    {
+      "id": "LEVEL_GATE",
+      "confidence": "verified",
+      "anchors": [
+        "我要升级",
+        "17级可继续冒险",
+        "玩家经验",
+        "快速修炼",
+        "修炼收益"
+      ],
+      "actions": [
+        "use_quick_train_free",
+        "claim_idle",
+        "close"
+      ],
+      "next": [
+        "QUICK_TRAIN",
+        "IDLE_PANEL",
+        "ADVENTURE_CHAPTER"
+      ],
+      "notes": "章节推进被玩家等级门槛挡住时出现；右卡=快速修炼（每日首次免费），左卡=修炼收益"
+    },
+    {
+      "id": "QUICK_TRAIN",
+      "confidence": "verified",
+      "anchors": [
+        "快速修炼",
+        "今日剩余",
+        "首次免费",
+        "固定收益",
+        "概率掉落"
+      ],
+      "actions": [
+        "tap_free_train",
+        "close"
+      ],
+      "next": [
+        "IDLE_PANEL",
+        "REWARD_QUEUE"
+      ],
+      "notes": "每日首次免费=120分钟收益（本轮把玩家 16→19 级）；之后每次 50 紫晶卡，需显式开关；右上亮色 X 关闭"
+    },
+    {
+      "id": "MILESTONE_PANEL",
+      "confidence": "verified",
+      "anchors": [
+        "通关主线关卡",
+        "一键领取",
+        "再通关主线N关"
+      ],
+      "actions": [
+        "claim_all_milestones",
+        "close_panel"
+      ],
+      "next": [
+        "ADVENTURE_CHAPTER",
+        "REWARD_QUEUE"
+      ],
+      "notes": "章节地图右上宝箱进入；已领取的行带勾选；领取后走恭喜获得层"
+    },
+    {
+      "id": "TRAINING_HUB",
+      "confidence": "verified",
+      "anchors": [
+        "日常修行",
+        "玄黄要塞",
+        "升至25级开启"
+      ],
+      "actions": [
+        "open_daily_training"
+      ],
+      "next": [
+        "TRAINING_STAGE_LIST"
+      ],
+      "notes": "历练模块首屏；玄黄要塞 25 级解锁"
+    },
+    {
+      "id": "TRAINING_STAGE_LIST",
+      "confidence": "verified",
+      "anchors": [
+        "金币修行",
+        "斗气修行",
+        "简单1",
+        "今日免费扫荡",
+        "一键扫荡",
+        "扫荡"
+      ],
+      "actions": [
+        "fight_stage",
+        "sweep_stage"
+      ],
+      "next": [
+        "FORMATION",
+        "REWARD_QUEUE"
+      ],
+      "notes": "四页签 金币/斗气/装备/斗技；20 级时装备/斗技点击无反馈（对应门槛 22/26 级）；免费扫荡 2 次/日，用尽后 20 紫晶卡/次"
+    },
+    {
+      "id": "FACTION_LIST",
+      "confidence": "verified",
+      "anchors": [
+        "请输入势力名称查找",
+        "申请",
+        "已满员",
+        "加入势力",
+        "创建势力"
+      ],
+      "actions": [
+        "apply_faction",
+        "create_faction"
+      ],
+      "next": [
+        "FACTION_HOME"
+      ],
+      "notes": "申请需满足势力等级要求；已满员(30/30)不可申请"
+    },
+    {
+      "id": "FACTION_HOME",
+      "confidence": "verified",
+      "anchors": [
+        "势力大殿",
+        "势力道场",
+        "势力捐献",
+        "双盟竞逐",
+        "势力试炼",
+        "界域争锋"
+      ],
+      "actions": [
+        "open_hall",
+        "open_donate",
+        "open_training"
+      ],
+      "next": [
+        "FACTION_DONATE"
+      ],
+      "notes": "加入势力后的内部地图；教程链依次介绍 大殿→道场"
+    },
+    {
+      "id": "FACTION_DONATE",
+      "confidence": "verified",
+      "anchors": [
+        "势力捐献",
+        "剩余捐赠次数",
+        "每日可免费捐赠",
+        "获得",
+        "捐献"
+      ],
+      "actions": [
+        "donate_free",
+        "close"
+      ],
+      "next": [
+        "REWARD_QUEUE"
+      ],
+      "notes": "每日免费捐献 5 次（消耗 0，得 3100 势力贡献 +6 势力经验类）；20 次/日上限；超出免费次数消耗紫晶卡"
+    },
+    {
+      "id": "NAJIE_HOME",
+      "confidence": "verified",
+      "anchors": [
+        "装备",
+        "专属",
+        "斗技",
+        "异火",
+        "血精",
+        "升至22级开启",
+        "升至26级开启"
+      ],
+      "actions": [
+        "open_xuejing",
+        "close"
+      ],
+      "next": [
+        "XUEJING_PANEL"
+      ],
+      "notes": "装备 22 级、斗技 26 级；专属/异火需 60 级 + 开服 12/15 天"
+    },
+    {
+      "id": "XUEJING_PANEL",
+      "confidence": "verified",
+      "anchors": [
+        "凝练",
+        "血精",
+        "魔核",
+        "提炼",
+        "凝练等级",
+        "再凝练N次必出神话血精",
+        "今天还可以凝练"
+      ],
+      "actions": [
+        "refine_once",
+        "switch_tab"
+      ],
+      "next": [
+        "XUEJING_PANEL"
+      ],
+      "notes": "凝练消耗势力贡献 1700/次；保底 20 次必出神话血精；日上限 100 次；凝练等级本轮 21/23/18/30（火/雷/水/风）"
+    },
+    {
+      "id": "AUTO_CHALLENGE",
+      "confidence": "verified",
+      "anchors": [
+        "下一关",
+        "开启自动挑战",
+        "确定",
+        "全场最佳"
+      ],
+      "actions": [
+        "tap_next_stage",
+        "enable_auto",
+        "tap_confirm"
+      ],
+      "next": [
+        "FORMATION",
+        "BATTLE",
+        "AUTO_CHALLENGE",
+        "REWARD_QUEUE"
+      ],
+      "notes": "胜利页新增按钮；自动挑战勾选跨章保留；战败即停；升级/解锁弹层会插入 REWARD_QUEUE"
+    }
+  ],
+  "evidenceStateAliases": {
+    "note": "证据索引里的 state 是采集当时的标签，本表把它映射到上面的标准状态 ID；一个标签对应多个状态时（如 MODULE_SHILI）由锚点消歧。UNMAPPED 表示该证据不参与状态建模。",
+    "map": {
+      "ADVENTURE_CHAPTER": [
+        "ADVENTURE_CHAPTER"
+      ],
+      "ADVENTURE_CHAPTER2": [
+        "ADVENTURE_CHAPTER"
+      ],
+      "ADVENTURE_CHAPTER3": [
+        "ADVENTURE_CHAPTER"
+      ],
+      "ADVENTURE_CHAPTER4": [
+        "ADVENTURE_CHAPTER"
+      ],
+      "ADVENTURE_CHAPTER5": [
+        "ADVENTURE_CHAPTER"
+      ],
+      "ADVENTURE_CHAPTER_REWARD_PROMPT": [
+        "MILESTONE_PANEL",
+        "REWARD_QUEUE"
+      ],
+      "ADVENTURE_CHAPTER_TUTORIAL_CITY": [
+        "ADVENTURE_CHAPTER",
+        "TUTORIAL_GUIDE"
+      ],
+      "ADVENTURE_STAGE_LIST": [
+        "STAGE_LIST"
+      ],
+      "AUTO_CHALLENGE": [
+        "AUTO_CHALLENGE"
+      ],
+      "BATTLE": [
+        "BATTLE"
+      ],
+      "BATTLE_RESULT": [
+        "BATTLE_RESULT"
+      ],
+      "CITY_MAP_RECRUIT_PROMPT": [
+        "MAIN_CITY",
+        "TUTORIAL_GUIDE"
+      ],
+      "DAILY_TRAINING": [
+        "TRAINING_STAGE_LIST"
+      ],
+      "DAILY_TRAINING_DOUJI": [
+        "TRAINING_STAGE_LIST"
+      ],
+      "DAILY_TRAINING_DOUQI": [
+        "TRAINING_STAGE_LIST"
+      ],
+      "DAILY_TRAINING_ZHUANGBEI": [
+        "TRAINING_STAGE_LIST"
+      ],
+      "FORMATION": [
+        "FORMATION"
+      ],
+      "HERO_DETAIL": [
+        "HERO_DETAIL"
+      ],
+      "HERO_DETAIL_ADVANCE": [
+        "HERO_DETAIL"
+      ],
+      "HERO_DETAIL_ADVANCE_DONE": [
+        "HERO_DETAIL"
+      ],
+      "HERO_DETAIL_UPGRADE": [
+        "HERO_DETAIL"
+      ],
+      "HERO_LIST": [
+        "HERO_LIST"
+      ],
+      "IDLE_PLATFORM": [
+        "IDLE_PANEL"
+      ],
+      "MILESTONE_PANEL": [
+        "MILESTONE_PANEL"
+      ],
+      "MODULE_NAJIE": [
+        "NAJIE_HOME"
+      ],
+      "MODULE_NAJIE_XUEJING": [
+        "XUEJING_PANEL"
+      ],
+      "MODULE_SHILI": [
+        "FACTION_LIST",
+        "FACTION_HOME"
+      ],
+      "MODULE_SHILI_DADIAN": [
+        "FACTION_HOME"
+      ],
+      "MODULE_SHILI_DONATE": [
+        "FACTION_DONATE"
+      ],
+      "POPUP_QUEUE": [
+        "REWARD_QUEUE"
+      ],
+      "QUICK_TRAIN": [
+        "QUICK_TRAIN"
+      ],
+      "REALM_PANEL": [
+        "REALM_PANEL"
+      ],
+      "REWARD_QUEUE": [
+        "REWARD_QUEUE"
+      ],
+      "STAGE_LIST": [
+        "STAGE_LIST"
+      ],
+      "TRAINING_BATTLE": [
+        "FORMATION"
+      ],
+      "TRAINING_HUB": [
+        "TRAINING_HUB"
+      ],
+      "VICTORY": [
+        "BATTLE_RESULT"
+      ],
+      "RECRUIT_PAGE_TUTORIAL": [
+        "UNMAPPED"
+      ],
+      "RECRUIT_RESULT": [
+        "UNMAPPED"
+      ],
+      "PIPELINE_SMOKE": [
+        "UNMAPPED"
+      ],
+      "LEGACY_SHOT": [
+        "UNMAPPED"
+      ],
+      "UNKNOWN": [
+        "UNMAPPED"
+      ],
+      "BATTLE_DEFEAT": [
+        "BATTLE_DEFEAT"
+      ]
+    }
+  }
+}

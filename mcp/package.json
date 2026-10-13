@@ -1,0 +1,36 @@
+{
+  "name": "hz-autojs-toolbox-ai-capabilities-mcp",
+  "version": "1.0.0",
+  "license": "GPL-3.0-only",
+  "description": "Dual MCP servers for HuaZai AutoJs Toolbox V5 device operation and project development.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "hz-autojs-device-mcp": "dist/device/index.js",
+    "hz-autojs-project-mcp": "dist/project/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/device/index.js",
+    "dev": "tsx src/device/index.ts",
+    "docs:index": "node scripts/build-autojs-index.mjs",
+    "docs:index:check": "node scripts/build-autojs-index.mjs --check",
+    "pretest": "npm run docs:index:check",
+    "prebuild": "npm run docs:index:check",
+    "test:unit": "node --import tsx --test test/*.test.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

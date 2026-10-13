@@ -1,0 +1,542 @@
+{
+  "schemaVersion": 1,
+  "kind": "hz-autojs-project-brief",
+  "project": {
+    "id": "dupo-cangqiong",
+    "packageName": "com.leniu.dpcqln.ld",
+    "deviceId": "device_android_e3bf91f528e0bbfe",
+    "baseline": {
+      "width": 1080,
+      "height": 1920
+    },
+    "generator": "hz-autojs-automation-builder/generate-project.mjs",
+    "generatedAt": "2026-10-04T14:16:32.563Z",
+    "sourceRun": "data/exploration/dupo-cangqiong-20261001",
+    "sourceTaskId": "dupo-cangqiong-newbie-idle-panel",
+    "contractProvenance": "config/generated.json"
+  },
+  "conversation": {
+    "answerSections": [
+      "这是什么",
+      "现在能做什么",
+      "你现在在哪、建议做什么",
+      "你可以怎么说"
+    ],
+    "commandExamples": [
+      "这个项目能做什么？",
+      "现在能做什么？",
+      "先只判一下当前状态",
+      "跑一次 <任务名>",
+      "关一下弹窗"
+    ],
+    "rules": [
+      "只列 status 为 generated 或 compiled-needs-verification 的能力；partial-implementation / not-implemented 不得承诺",
+      "回答前先只读跑 detect-state.js 拿当前状态",
+      "knownGaps / missingEvidence 里的内容不得承诺",
+      "写入任务必须先说明消耗与守卫，并且只接受 { task, dryRun:false, allowWrite:true }"
+    ]
+  },
+  "capabilities": [
+    {
+      "file": "bootstrap.js",
+      "id": "bootstrap.js",
+      "duty": "读设备模式与分辨率、加载坐标契约与状态模型、做锚点残差校验，失败则停手",
+      "readOnly": true,
+      "status": "generated",
+      "readiness": "ready",
+      "requiresStates": [],
+      "markers": [
+        "BOOTSTRAP_OK"
+      ],
+      "readings": [],
+      "checks": [],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "bootstrap.js"
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "detect-state.js",
+      "id": "detect-state.js",
+      "duty": "设备侧截图 + OCR 判当前状态，输出状态 ID 与命中锚点；未识别时留帧并升级",
+      "readOnly": true,
+      "status": "generated",
+      "readiness": "ready",
+      "requiresStates": [],
+      "markers": [
+        "STATE_DETECTED"
+      ],
+      "readings": [],
+      "checks": [],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "detect-state.js"
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "clear-popups.js",
+      "id": "clear-popups.js",
+      "duty": "关闭活动弹窗与奖励队列，避开付费入口和中间道具图标",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "REWARD_QUEUE",
+        "REWARD_POPUP",
+        "MILESTONE_PANEL",
+        "BATTLE_RESULT",
+        "IDLE_PANEL",
+        "REALM_PANEL",
+        "FACTION_DONATE"
+      ],
+      "markers": [
+        "STATE_DETECTED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "点击屏幕关闭",
+          "expect": false
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "clear-popups.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "adventure-challenge.js",
+      "id": "adventure-challenge.js",
+      "duty": "一关一条龙：章节地图/关卡列表 -> 挑战 -> 布阵 -> 出战（preSteps 只跑一次）-> 战斗 HUD 出来后每 6s 自动点一次右下快进(965,1560)，最多 8 次；命中「全场最佳」用命中帧复核并停，战败(变强途径)立即停手上报不盲点",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "ADVENTURE_CHAPTER",
+        "STAGE_LIST"
+      ],
+      "markers": [
+        "STAGE_CLEARED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "全场最佳"
+        }
+      ],
+      "loop": {
+        "maxIterations": 8,
+        "stopWhenAnchor": "全场最佳",
+        "verifyOnStop": true,
+        "stopWhenState": [
+          "BATTLE_DEFEAT"
+        ]
+      },
+      "missingEvidence": [],
+      "params": {
+        "task": "adventure-challenge.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "auto-challenge.js",
+      "id": "auto-challenge.js",
+      "duty": "连战推进：战斗页每轮「等 8s → 点右下快进(965,1560)」最多 10 轮，把当前战斗直接推到结算页；抓到「全场最佳」即用命中帧复核并停（marker STAGE_CLEARED）。快进键 OCR 读不到，只能几何定位；单脚本必须短于 3 分钟看门狗",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "BATTLE"
+      ],
+      "markers": [
+        "STAGE_CLEARED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "全场最佳"
+        }
+      ],
+      "loop": {
+        "maxIterations": 10,
+        "stopWhenAnchor": "全场最佳",
+        "verifyOnStop": true,
+        "stopWhenState": [
+          "BATTLE_DEFEAT"
+        ]
+      },
+      "missingEvidence": [],
+      "params": {
+        "task": "auto-challenge.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "milestone-claim.js",
+      "id": "milestone-claim.js",
+      "duty": "章节地图右上宝箱进入里程碑面板，只处理可领取行并复核已领取状态",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "MAIN_CITY",
+        "ADVENTURE_CHAPTER",
+        "MILESTONE_PANEL"
+      ],
+      "markers": [
+        "STATE_DETECTED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "milestone-claim.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "idle-claim.js",
+      "id": "idle-claim.js",
+      "duty": "进入修炼石台，读取累积量，领取一次并用资源增量或倒计时验证",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "MAIN_CITY",
+        "ADVENTURE_CHAPTER",
+        "IDLE_PANEL"
+      ],
+      "markers": [
+        "IDLE_CLAIMED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "idle-claim.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "realm-panel-claim.js",
+      "id": "realm-panel-claim.js",
+      "duty": "扫描任务卡三态，只处理领取，前往目标走白名单",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "MAIN_CITY",
+        "REALM_PANEL"
+      ],
+      "markers": [
+        "REALM_CLAIMED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "realm-panel-claim.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "hero-upgrade.js",
+      "id": "hero-upgrade.js",
+      "duty": "角色升级与进阶，资源不足时停止并记录",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "HERO_DETAIL",
+        "REWARD_QUEUE"
+      ],
+      "markers": [
+        "PROMOTION_CLAIMED"
+      ],
+      "readings": [],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "hero-upgrade.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "training-hub-fight.js",
+      "id": "training-hub-fight.js",
+      "duty": "历练·日常修行：进关卡战斗（首通按钮 战斗）；免费扫荡需先读今日免费次数（readingKey=freeSweepLeft），收费档跳过",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "MAIN_CITY",
+        "TRAINING_HUB",
+        "TRAINING_STAGE_LIST"
+      ],
+      "markers": [
+        "STAGE_CLEARED"
+      ],
+      "readings": [
+        {
+          "key": "freeSweepLeft",
+          "pattern": "扫荡[^0-9]{0,3}(\\d+)",
+          "when": "before"
+        }
+      ],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "training-hub-fight.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "faction-donate.js",
+      "id": "faction-donate.js",
+      "duty": "势力捐献：先读剩余免费次数与贡献数值，只走 0 消耗档，单次执行并复核剩余次数",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "FACTION_HOME",
+        "FACTION_DONATE"
+      ],
+      "markers": [
+        "DONATE_FREE_DONE"
+      ],
+      "readings": [
+        {
+          "key": "freeDonateLeft",
+          "pattern": "剩余捐赠次数\\s*(\\d+)",
+          "when": "before"
+        }
+      ],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "faction-donate.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "xuejing-refine.js",
+      "id": "xuejing-refine.js",
+      "duty": "血精凝练：先读势力贡献，≥1700 才点一次凝练，不连续点击，复核等级与剩余次数",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "NAJIE_HOME",
+        "XUEJING_PANEL"
+      ],
+      "markers": [
+        "XUEJING_REFINED"
+      ],
+      "readings": [
+        {
+          "key": "factionContribution",
+          "pattern": "势力贡献[:：]?\\s*(\\d+)",
+          "when": "before"
+        },
+        {
+          "key": "pityLeft",
+          "pattern": "再凝练\\s*(\\d+)\\s*次必出神话血精",
+          "when": "both"
+        }
+      ],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "神话血精"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "xuejing-refine.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    },
+    {
+      "file": "quick-train-free.js",
+      "id": "quick-train-free.js",
+      "duty": "快速修炼：进入面板核对今日剩余与首次免费，仅走每日首次免费（出现 50 紫晶卡消耗即停）",
+      "readOnly": false,
+      "status": "needs-verification",
+      "readiness": "ready",
+      "requiresStates": [
+        "MAIN_CITY",
+        "ADVENTURE_CHAPTER",
+        "IDLE_PANEL"
+      ],
+      "markers": [
+        "STATE_DETECTED"
+      ],
+      "readings": [
+        {
+          "key": "quickTrainLeft",
+          "pattern": "今日剩余\\s*(\\d+)",
+          "when": "before"
+        }
+      ],
+      "checks": [
+        {
+          "type": "anchor",
+          "text": "喜获"
+        }
+      ],
+      "loop": null,
+      "missingEvidence": [],
+      "params": {
+        "task": "quick-train-free.js",
+        "dryRun": false,
+        "allowWrite": true
+      },
+      "successRule": "marker 只在 verify 判据通过后发出；SUCCEEDED 只代表脚本跑完"
+    }
+  ],
+  "guards": {
+    "forbiddenTexts": [
+      "购买",
+      "充值",
+      "战令",
+      "礼包",
+      "超值返利",
+      "限购",
+      "扫码支付",
+      "微信支付",
+      "支付宝支付"
+    ],
+    "guardedActions": [
+      {
+        "text": "快速修炼",
+        "rule": "仅每日首次免费可用；出现 50 紫晶卡消耗时必须停止并记录",
+        "readingKey": "quickTrainLeft",
+        "min": 1
+      },
+      {
+        "text": "捐献",
+        "rule": "只使用每日免费次数（档位消耗为 0）；超出后消耗紫晶卡，一律跳过",
+        "readingKey": "freeDonateLeft",
+        "min": 1
+      },
+      {
+        "text": "凝练",
+        "rule": "先读势力贡献，≥1700 才执行一次，不连续点击",
+        "readingKey": "factionContribution",
+        "min": 1700
+      },
+      {
+        "text": "扫荡",
+        "rule": "只走每日免费次数；收费档（20 紫晶卡/次）跳过",
+        "readingKey": "freeSweepLeft",
+        "min": 1
+      }
+    ],
+    "uncoveredGuards": []
+  },
+  "verification": {
+    "successMarkers": [
+      "STATE_DETECTED",
+      "STAGE_CLEARED",
+      "IDLE_CLAIMED",
+      "REALM_CLAIMED",
+      "PROMOTION_CLAIMED",
+      "DONATE_FREE_DONE",
+      "XUEJING_REFINED"
+    ],
+    "uncoveredMarkers": [],
+    "markerRule": "marker 只在任务 verify 判据通过后发出"
+  },
+  "runtime": {
+    "aiInStableLoop": false,
+    "screenshotSource": "设备侧 toolManager.captureScreenshot",
+    "stateDetectionApi": "toolManager.recognizeText",
+    "deviceActionApi": "__toolboxTap",
+    "sync": "project_sync_plan → project_sync_push（显式清单）",
+    "runReadOnly": "project_run（默认 dryRun，只允许只读任务）",
+    "runWrite": "写入任务需要 { task, dryRun: false, allowWrite: true }",
+    "records": "<项目目录>/runs/*.jsonl（追加写）+ runs/shots/"
+  },
+  "knownGaps": [
+    "第 6、7 章已全部通关；第 8 章 8-1 实测战败（2026-10-02 16:26，战败页 BATTLE_DEFEAT）——斗气 53246 / 27 级低于该关推荐战力，需先变强（心火淬炼 / 斗者培养 / 招募 / 装备）再继续",
+    "关卡列表随通关累积滚动，靠后关卡的「挑战」需要先滚动再 OCR（滚动步骤尚未进任务卡）",
+    "等级提升后的「等级礼包」付费弹窗会插进流程并吞点击；已用 forbiddenTexts 挡住付费入口，但自动关掉该弹窗的动作尚未进任务卡",
+    "已实测：自动连战的终止条件包含「战败即停」（2026-10-02 16:02 连战停止；16:26 adventure-challenge 命中 BATTLE_DEFEAT 后按 stopWhenState 立即停手，不再空转到次数上限）；次数上限/弹层中断仍未单独验证",
+    "战败后的处置只做到如实上报 + 立即停手（BATTLE_DEFEAT + 不点付费变强入口），自动\"变强\"路径未实现",
+    "历练·日常修行的「扫荡」入口不在关卡列表页（列表页只有「战斗」与播放按钮）：training-hub-fight 已能读到「今日免费扫荡：N次」（regex 需容忍繁体 免費）并走到训练页，但扫荡按钮定位仍缺证据，该任务当前判失败",
+    "领奖弹窗是美术字、OCR 不稳定（恭喜获得→「義喜获得 / 2蠡喜获釋」，点击任意位置关闭→「关美闭」）：已建模 REWARD_POPUP（子串锚点 喜获 / 点击任意位置关）并允许 UNKNOWN 时先归位一次，但单帧判断仍可能漏检（16:21 / 16:25 实测首帧命中、复帧漏检）",
+    "快速修炼每日首次免费已用完：quick-train-free 被守卫正确拒绝（GUARD_RULE_TEXT_ONLY，出现 50 紫晶卡消耗即停），未发生付费",
+    "18:9 与 19.5:9+ 分辨率分组未实测，坐标契约只声明 16:9@1080x1920 已验证",
+    "纳戒的装备 / 专属 / 斗技 / 异火四祭坛，以及势力的道场 / 双盟竞逐 / 势力试炼 / 界域争锋未进入",
+    "结算奖励队列的完整层数与顺序未完全枚举，关层仍依赖「底部空白区」经验规则"
+  ],
+  "contractWarnings": [],
+  "notImplemented": [],
+  "partialImplementation": []
+}

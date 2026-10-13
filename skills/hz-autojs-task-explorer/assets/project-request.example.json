@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "sourceTaskId": "dupo-cangqiong-daily",
+  "sourceRun": "data/exploration/dupo-cangqiong-20261001",
+  "projectTemplate": "state-machine",
+  "inputs": {
+    "stateModel": "state-model.json",
+    "evidenceIndex": "evidence-index.json",
+    "findings": "findings.md"
+  },
+  "target": {
+    "packageName": "com.leniu.dpcqln.ld",
+    "deviceId": "device_android_e3bf91f528e0bbfe",
+    "baseline": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "requestedScripts": [
+    {
+      "name": "bootstrap.js",
+      "duty": "环境自检",
+      "readiness": "ready"
+    },
+    {
+      "name": "detect-state.js",
+      "duty": "状态判定",
+      "readiness": "ready"
+    },
+    {
+      "name": "idle-claim.js",
+      "duty": "进入修炼石台，读取累积量，领取一次并用资源增量或倒计时验证",
+      "readiness": "ready",
+      "spec": {
+        "startStates": ["ADVENTURE_CHAPTER"],
+        "steps": [
+          { "op": "tap", "element": "idle_platform_entry", "guard": false },
+          { "op": "tap", "element": "panel_claim", "readFirst": true }
+        ],
+        "readings": [
+          { "key": "idleAccumulated", "pattern": "([0-9]+)/M", "when": "both" }
+        ],
+        "verify": [
+          { "type": "changed", "key": "idleAccumulated", "direction": "decrease" },
+          { "type": "anchor", "text": "倒计时" }
+        ],
+        "markers": ["IDLE_CLAIMED"]
+      }
+    },
+    {
+      "name": "faction-donate.js",
+      "duty": "势力捐献：先读剩余免费次数，只走 0 消耗档，单次执行并复核剩余次数",
+      "readiness": "ready",
+      "spec": {
+        "startStates": ["FACTION_HOME"],
+        "steps": [
+          { "op": "tap", "element": "faction_donate_entry", "guard": false },
+          { "op": "tap", "element": "faction_donate_button", "readFirst": true },
+          { "op": "tap", "element": "faction_donate_confirm", "guard": false }
+        ],
+        "readings": [
+          { "key": "freeDonateLeft", "pattern": "([0-9]+)/20", "when": "both" }
+        ],
+        "verify": [
+          { "type": "changed", "key": "freeDonateLeft", "direction": "decrease" }
+        ],
+        "markers": ["DONATE_FREE_DONE"]
+      }
+    },
+    {
+      "name": "auto-challenge.js",
+      "duty": "胜利页开启自动挑战并巡检，战败 / 弹层中断 / 达到次数上限即停",
+      "readiness": "partial",
+      "missingEvidence": [
+        "自动挑战终止条件（次数上限 / 战败 / 弹层中断）未验证",
+        "未做可中断单步模式的脚本级复跑证据"
+      ]
+    }
+  ],
+  "coordinateSpec": {
+    "file": "assets/coordinate-spec.example.json",
+    "verifiedBuckets": ["16:9@1080x1920"],
+    "unverifiedBuckets": ["18:9", "19.5:9+", "landscape"]
+  },
+  "runtimeConstraints": {
+    "aiInStableLoop": false,
+    "maxUnknownStateEscalations": 2,
+    "selfScreenshotAllowed": true,
+    "screenshotSource": "设备侧 toolManager.captureScreenshot（默认）；未知状态升级时才用宿主 device_screenshot",
+    "stateDetectionApi": "toolManager.recognizeText（MLKIT_PLUGIN）",
+    "deviceActionApi": "__toolboxTap",
+    "forbiddenTexts": ["购买", "充值", "战令"],
+    "guardedActions": [
+      { "text": "快速修炼", "rule": "仅每日首次免费可用；出现 50 紫晶卡消耗时必须停止并记录" },
+      { "text": "捐献", "rule": "只使用每日免费次数（档位消耗为 0）；超出后消耗紫晶卡，一律跳过", "readingKey": "freeDonateLeft" },
+      { "text": "凝练", "rule": "先读势力贡献，≥1700 才执行一次，不连续点击", "readingKey": "factionContribution" },
+      { "text": "扫荡", "rule": "只走每日免费次数；收费档（20 紫晶卡/次）跳过", "readingKey": "freeSweepLeft" }
+    ]
+  },
+  "verification": {
+    "replayRequired": true,
+    "evidenceDirectory": "runs/",
+    "successMarkers": ["STATE_DETECTED", "IDLE_CLAIMED", "DONATE_FREE_DONE"]
+  },
+  "openGaps": [
+    "示例缺口：未就绪任务按 missingEvidence 逐条补齐后才能改为 ready"
+  ]
+}
