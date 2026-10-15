@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "hz-autojs-device-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${CODEBUDDY_PLUGIN_ROOT}/mcp/dist/device/index.js"
+      ],
+      "cwd": "${CODEBUDDY_PLUGIN_ROOT}"
+    },
+    "hz-autojs-project-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${CODEBUDDY_PLUGIN_ROOT}/mcp/dist/project/index.js"
+      ],
+      "cwd": "${CODEBUDDY_PLUGIN_ROOT}",
+      "env": {
+        "HZ_MCP_CLIENT_ID": "hz-autojs-project-mcp"
+      }
+    },
+    "hz-autojs-authoring-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${CODEBUDDY_PLUGIN_ROOT}/mcp/dist/authoring/index.js"
+      ],
+      "cwd": "${CODEBUDDY_PLUGIN_ROOT}",
+      "env": {
+        "HZ_MCP_CLIENT_ID": "hz-autojs-authoring-mcp"
+      }
+    }
+  }
+}

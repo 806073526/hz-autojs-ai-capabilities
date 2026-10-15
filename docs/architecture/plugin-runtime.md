@@ -33,24 +33,25 @@
 - `mcp/src/device/`：设备 MCP 入口与设备、控制、识别、脚本、任务工具。
 - `mcp/src/project/`：项目 MCP 入口与项目同步、运行、打包、安装、状态和日志工具。
 - `mcp/src/authoring/`：作者工具 MCP 入口与教程录制工具（默认关闭，开启后注册 10 个录制工具）。
-- `.mcp.json` 与 `.claude.mcp.json` 同时声明 `hz-autojs-device-mcp`、`hz-autojs-project-mcp` 和 `hz-autojs-authoring-mcp`。
+- `.mcp.json`、`.claude.mcp.json` 与 `mcp/workbuddy.mcp.json` 同时声明 `hz-autojs-device-mcp`、`hz-autojs-project-mcp` 和 `hz-autojs-authoring-mcp`。
 
 设备入口在原有 21 个设备工具之外，另注册 2 个不依赖 V5 的 AutoJs 文档索引工具（`autojs_docs_search`、`autojs_docs_read`）与 3 个知识库只读工具（`knowledge_search`、`knowledge_read`、`knowledge_assets`）；原有 21 个工具的名称、schema 和行为不变，且不包含项目同步、设备文件管理或 APK 安装。
 项目入口不复制 `device_list` 和 `device_status`，也不跨 MCP 调用另一个 server 的工具。三个入口的工具名不重复。
 
 ## 客户端清单与市场
 
-同一份源目录装配三个客户端的清单，版本由打包脚本校验一致：
+同一份源目录装配四个客户端的清单，版本由打包脚本校验一致：
 
 | 客户端 | 插件清单 | 市场清单 | MCP 入口 |
 | --- | --- | --- | --- |
 | Codex | `.codex-plugin/plugin.json` | `.agents/plugins/marketplace.json` | `.mcp.json`（相对路径，由 Codex 按插件根解析） |
 | Claude Code | `.claude-plugin/plugin.json` | `.claude-plugin/marketplace.json` | `.claude.mcp.json`（`${CLAUDE_PLUGIN_ROOT}` 绝对化） |
 | ZCode | `.zcode-plugin/plugin.json` | `.claude-plugin/marketplace.json` | `.claude.mcp.json` |
+| WorkBuddy | `.workbuddy-plugin/plugin.json` | `.workbuddy-plugin/marketplace.json` | `mcp/workbuddy.mcp.json`（`${CODEBUDDY_PLUGIN_ROOT}` 绝对化；引擎同时扫描插件内 `mcp/*.json`，该文件按文件名序最后加载，覆盖根 `.mcp.json` 的相对路径版本） |
 
 ZCode 的插件清单查找顺序是 `.zcode-plugin/plugin.json` → `.claude-plugin/plugin.json` → `.codex-plugin/plugin.json`；市场清单优先 `.claude-plugin/marketplace.json`，其次根目录 `marketplace.json`。市场条目 `source` 为 `"."` 时，ZCode 把市场根目录自身解析为插件根，因此解压目录同时是市场根与插件根。ZCode 运行时还会自动读取插件根 `.mcp.json`（Codex 的相对路径版本，ZCode 不会把 `cwd` 解析到插件根），所以 `.zcode-plugin/plugin.json` 显式声明 `mcpServers` 指向 `.claude.mcp.json`，以 manifest 覆盖同名 server 的入口。以上规则依据 ZCode 官方文档与 `zai-org/ZCode` 开源实现（`apps/zcode-cli/packages/adapters/src/plugins/marketplace.ts`、`mcp.ts`、`index.ts`）核对。
 
-上面的三份清单不是接入的唯一形态。`skills/<名>/SKILL.md` 与 `.mcp.json` 本身不绑定客户端，其他支持「技能 + MCP」的工具（豆包、WorkBuddy 等）按包内 `README.md` 的「通用插件模式」章节自行接入：技能指向 `skills/`，MCP 从 `.mcp.json` 抄启动命令并把相对路径换成解压目录的绝对路径。但「包内 `.mcp.json` 是模板」不等于「写完模板就生效」：各客户端把 server 注册到哪里，必须在用户指南的「各客户端 MCP 注册位置」表里逐一给出（例如 WorkBuddy 只读取用户级 `~/.workbuddy/mcp.json` / 项目级 `<项目目录>/.workbuddy/mcp.json` 的 `mcpServers`，插件自带的 `.mcp.json` 不会被它读取）；注册态验收（MCP 管理界面条目 + 新会话原生工具 + 原生工具调用成功）与升级时要同步更新注册路径的口径同表。因此本仓库不为这些客户端新增专属清单，也不把某一份客户端清单当作通用事实来源；打包白名单与升级口径见 `packaging/README.md`。
+上面的四份清单不是接入的唯一形态。`skills/<名>/SKILL.md` 与 `.mcp.json` 本身不绑定客户端，其他支持「技能 + MCP」的工具（例如豆包）按包内 `README.md` 的「通用插件模式」章节自行接入：技能指向 `skills/`，MCP 从 `.mcp.json` 抄启动命令并把相对路径换成解压目录的绝对路径。但「包内 `.mcp.json` 是模板」不等于「写完模板就生效」：各客户端把 server 注册到哪里，必须在用户指南的「各客户端 MCP 注册位置」表里逐一给出（WorkBuddy 默认随 `.workbuddy-plugin/plugin.json` 清单注册——引擎按 `.codebuddy-plugin` → `.workbuddy-plugin` → `.claude-plugin` 顺序找清单，并依次合并清单 `mcpServers`、插件根 `.mcp.json`、插件内 `mcp/*.json`，同名 server 后者覆盖前者，所以 WorkBuddy 专用配置放在 `mcp/workbuddy.mcp.json` 而不是插件根；手工回退才是用户级 `~/.workbuddy/mcp.json` / 项目级 `<项目目录>/.workbuddy/mcp.json` 的 `mcpServers`）；注册态验收（MCP 管理界面条目 + 新会话原生工具 + 原生工具调用成功）与升级时要同步更新注册路径的口径同表。因此本仓库不为通用模式客户端新增专属清单，也不把某一份客户端清单当作通用事实来源；打包白名单与升级口径见 `packaging/README.md`。
 
 ## 知识库只读工具
 

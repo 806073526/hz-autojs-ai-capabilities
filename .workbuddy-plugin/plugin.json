@@ -1,0 +1,17 @@
+{
+  "name": "hz-autojs-ai-capabilities",
+  "version": "1.0.16+hz.20261015200637",
+  "description": "华仔 AutoJs 工具箱 V5 的设备 MCP、项目开发 MCP、教程作者 MCP 与操作技能（WorkBuddy 版）。",
+  "author": {
+    "name": "zjh336"
+  },
+  "keywords": [
+    "autojs",
+    "android",
+    "mcp",
+    "device-automation",
+    "hua-zai-toolbox"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./mcp/workbuddy.mcp.json"
+}

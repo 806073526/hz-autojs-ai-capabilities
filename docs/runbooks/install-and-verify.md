@@ -15,7 +15,7 @@
 
 没有完成的层级应明确写成未验证。
 
-包内 `README.md` 的「通用插件模式」章节是文档能力，不在上述 Codex 装机验收层级内：它不新增任何清单文件。豆包的技能注册与 stdio MCP 接入、WorkBuddy 的技能注册已由用户侧验证；WorkBuddy 的 MCP 注册位置（`%USERPROFILE%\.workbuddy\mcp.json` 的 `mcpServers`，按 WorkBuddy 官方文档核对；合并写入、Trust 后重启为用户侧反查结论）与注册步骤已写入用户指南的「各客户端 MCP 注册位置」，其注册态尚无用户侧确认证据。通用模式的验收按「客户端注册态」判定（缺一不可）：客户端 MCP 管理界面可见三个 server 条目、新会话出现原生 `mcp__hz-autojs-*` 工具、原生工具调用成功；只拉起 MCP 进程或经兜底通道调用成功都不代表注册通过；升级时要同步更新注册路径，该要求同表。打包产物在 `plugin-release-manifest.json` 的 `universalModeAcceptance` 记录上述验证范围。其余客户端仍以目标客户端实际能力为准。
+包内各客户端的专属清单（`.workbuddy-plugin/` 等）不在上述 Codex 装机验收层级内：WorkBuddy 由插件机制自带清单与 MCP（`.workbuddy-plugin/plugin.json` → `mcp/workbuddy.mcp.json`），本机 5.8.2 已完成「本地市场注册 → 安装插件 → 引擎加载清单并拉起三个 MCP 进程」验证（源目录与安装缓存目录各一次，入口与 `cwd` 均指向插件根），登录后的 GUI 会话内原生工具调用仍待复核。WorkBuddy 的手工回退位置（`%USERPROFILE%\.workbuddy\mcp.json` 的 `mcpServers`，合并写入、Trust 后重启）与注册步骤已写入用户指南的「各客户端 MCP 注册位置」。通用模式客户端（例如豆包）的验收按「客户端注册态」判定（缺一不可）：客户端 MCP 管理界面可见三个 server 条目、新会话出现原生 `mcp__hz-autojs-*` 工具、原生工具调用成功；只拉起 MCP 进程或经兜底通道调用成功都不代表注册通过；升级时要同步更新注册路径，该要求同表。打包产物在 `plugin-release-manifest.json` 的 `workbuddyClient` 与 `universalModeAcceptance` 记录上述验证范围。其余客户端仍以目标客户端实际能力为准。
 
 ## 检查源码
 
@@ -28,7 +28,7 @@ npm test
 npm run build
 ```
 
-确认 `.codex-plugin/plugin.json`、`.claude-plugin/plugin.json`、`.zcode-plugin/plugin.json`、`.mcp.json`、`.claude.mcp.json` 与 `.claude-plugin/marketplace.json` 指向存在的文件或目录。三个 manifest 与市场条目版本必须一致；打包脚本会做这项静态校验。
+确认 `.codex-plugin/plugin.json`、`.claude-plugin/plugin.json`、`.zcode-plugin/plugin.json`、`.workbuddy-plugin/plugin.json`、`.mcp.json`、`.claude.mcp.json`、`.claude-plugin/marketplace.json`、`.workbuddy-plugin/marketplace.json` 与 `mcp/workbuddy.mcp.json` 指向存在的文件或目录。四个 manifest 与两份市场条目版本必须一致；打包脚本会做这项静态校验。
 
 ## 检查 Marketplace
 
@@ -55,7 +55,7 @@ codex plugin add hz-autojs-ai-capabilities@hz-autojs-source --json
 codex plugin list --json
 ```
 
-核对 `pluginId`、`version`、`installed`、`enabled` 和来源。更新版本时先修改三个 manifest 的 cachebuster，再重装；Windows 文件锁可能阻止移除，不能删除源目录或直接编辑缓存来规避。
+核对 `pluginId`、`version`、`installed`、`enabled` 和来源。更新版本时先修改四个 manifest 的 cachebuster，再重装；Windows 文件锁可能阻止移除，不能删除源目录或直接编辑缓存来规避。
 
 ## 安装 ZCode 插件（GUI，手动）
 
@@ -66,6 +66,15 @@ ZCode 没有稳定的命令行装机验收入口，按以下步骤在客户端�
 3. 核对六个技能注册到「Plugin 技能」：`hz-autojs-device-operator`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer`。
 4. 核对 MCP 设置中出现三个 server（命名空间 `plugin:hz-autojs-ai-capabilities:`）：`hz-autojs-device-mcp`、`hz-autojs-project-mcp`、`hz-autojs-authoring-mcp`，入口指向插件根 `mcp/dist/{device,project,authoring}/index.js`。
 5. 以新任务执行一次只读 `device_list`；V5 条件不具备时停在工具列表验证，并把真实调用记为缺口。
+
+## 安装 WorkBuddy 插件（GUI 或自带 CLI）
+
+WorkBuddy 与 Codex 共用同一份解压目录；包内 `.workbuddy-plugin/plugin.json`（`mcpServers` 指向 `./mcp/workbuddy.mcp.json`）与 `.workbuddy-plugin/marketplace.json`（条目 `source` 为 `"."`）让插件与市场都指向目录自身，装上即自带三个 MCP。
+
+1. GUI：侧边栏「插件」→ 添加本地目录市场（指向解压目录）→ 安装 `hz-autojs-ai-capabilities` 并启用。
+2. CLI（可选，本机 5.8.2 实测）：设 `ACC_PRODUCT_CONFIG_PATH` 为 WorkBuddy 安装目录下的 `resources/app.asar.unpacked/cli/product.json`、`CODEBUDDY_CONFIG_DIR` 为 `%USERPROFILE%\.workbuddy`，然后依次执行 `node <cli> plugin marketplace add <解压目录>`、`plugin install hz-autojs-ai-capabilities@hz-autojs-local`、`plugin list --json`（CLI 为安装目录 `resources/app.asar.unpacked/cli/dist/codebuddy-lite-wb.mjs`）。
+3. 核对：`~/.workbuddy/plugins/installed_plugins.json` 与 `settings.json` 的 `enabledPlugins` 出现该插件且版本一致；WorkBuddy 日志出现 `Loaded 3 MCP server(s) from extension: hz-autojs-ai-capabilities` 与 `has 3 MCP servers`，三个 MCP 进程入口指向插件根 `mcp/dist/{device,project,authoring}/index.js`、`cwd` 为插件根。
+4. 以新会话执行一次只读 `device_list`；需要登录而条件不具备时，把 GUI 会话内原生工具调用记为缺口，不得用 CLI 加载或兜底直连代替。
 
 ## 核对 MCP 注册和缓存
 
@@ -126,4 +135,4 @@ node "$cache\mcp\dist\authoring\index.js"
 
 ## 结果记录
 
-每次发布至少记录源 commit、三个 manifest 版本、构建与测试结果、Codex 安装版本、三个 MCP 的 cache `cwd`、ZCode 客户端市场/安装/工具列表结论（或未验证）、三入口工具数量与差异、最小调用结果和未验证项。不要用“源码已更新”代替发布结论。
+每次发布至少记录源 commit、四个 manifest 版本、构建与测试结果、Codex 安装版本、三个 MCP 的 cache `cwd`、ZCode 与 WorkBuddy 客户端市场/安装/工具列表结论（或未验证）、三入口工具数量与差异、最小调用结果和未验证项。不要用“源码已更新”代替发布结论。

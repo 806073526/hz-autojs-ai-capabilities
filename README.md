@@ -53,6 +53,7 @@ npm run build
 - `.codex-plugin/`、`.mcp.json`：Codex 插件和 MCP 启动入口。
 - `.zcode-plugin/`：ZCode 插件清单；`mcpServers` 指向 `.claude.mcp.json`，覆盖 ZCode 自动读取的 Codex 相对路径配置。
 - `.claude-plugin/`、`.claude.mcp.json`：Claude Code 插件清单与 MCP 启动入口；`.claude-plugin/marketplace.json` 同时是 ZCode 与 Claude Code 的本地市场清单。
+- `.workbuddy-plugin/`、`mcp/workbuddy.mcp.json`：WorkBuddy 插件清单、本地市场清单与 MCP 启动入口；用 `${CODEBUDDY_PLUGIN_ROOT}` 绝对化入口路径。该 MCP 文件必须留在 `mcp/` 目录：WorkBuddy 引擎会扫描插件内 `mcp/*.json`，靠它覆盖插件根 `.mcp.json` 的同名 server（覆盖顺序：清单 mcpServers → `.mcp.json` → `mcp/*.json`）。
 - `mcp/`：TypeScript MCP Server、测试、随包 AutoJs 离线文档与符号级索引；`mcp/src/core/` 为双入口共用核心。
 - `mcp/docs/autojs-index.json`：从离线文档蒸馏的符号级索引，供 device MCP 与 V5 AI 工作台共用。
 - `skills/`：设备操作、AutoJs 脚本编写、项目开发部署、任务探索、自动化项目生成和检测模型训练技能。

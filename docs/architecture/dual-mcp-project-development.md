@@ -421,7 +421,7 @@ MCP 调用 canonical tool 时，V5 可能返回 `PENDING_CONFIRMATION`（工具�
 - 项目同步必须显式区分新增、覆盖和删除。默认不得删除远端文件。
 - `device_file_operation` 的删除、重命名和解压必须可追踪，不能作为同步失败的静默修复。
 - 本地目录扫描、完整同步基线和上传编排属于 MCP 侧；V5 只保存映射记录与最近同步摘要，文件库和设备真实状态仍以 V5 任务结果为准。
-- Codex、Claude Code、ZCode 和未来客户端的 MCP 配置格式不同，需要分别验证多 server 声明。
+- Codex、Claude Code、ZCode、WorkBuddy 和未来客户端的 MCP 配置格式不同，需要分别验证多 server 声明。
 - 当前缓存版本不能被直接编辑。源码、构建、安装、注册、缓存和实时工具列表必须逐层验收。
 - A 与 B 跨节点时，`LOCAL_PATH` 指向 B 的服务端路径，不能用于表达 A 的本地项目；A 的本地文件必须经上传接口登记到 B。
 - 设备访问密码不得写入 MCP 配置或长期缓存；只允许使用既有设备访问令牌和 MCP 短期 grant。

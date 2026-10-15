@@ -8,7 +8,7 @@
 
 - 使用 AI 观察、操作和验证 Android 设备的开发者与测试人员。
 - 生成、提交和排查 AutoJs 脚本的 V5 维护者。
-- 需要把 V5 设备能力接入 Codex、Claude Code、ZCode 或其他 MCP 客户端的集成人员。
+- 需要把 V5 设备能力接入 Codex、Claude Code、ZCode、WorkBuddy 或其他 MCP 客户端的集成人员。
 
 ## 能力范围
 
