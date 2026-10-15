@@ -56,6 +56,7 @@
 - `v5ServerVersion`：`hz_autojs_toolbox_v5/backend/pom.xml` 的项目版本。
 - `androidAppVersionName` / `androidAppVersionCode` / `androidAppPackageName`：`hz_autojs_toolbox_v5/mobile/project.json`。
 - `v5SourceCommit`、`pluginSourceCommit`：两个仓库打这个包时的 commit。
+- `clientRequirements`：客户端接入要求（Node.js ≥ 20、`SKILL.md` 技能形态、stdio MCP 与「注册位置见包内 `README.md` 的『各客户端 MCP 注册位置』」指引），供安装前自检；不代替版本兼容性声明。
 - `releaseBatch`、`generatedAtUtc`。
 
 口径：这些值表示“本包基于哪个 V5 版本构建”，不是自动的兼容性声明；实际可用能力以用户的 V5 版本、APP 版本和授权为准。可用 `-ServerVersion`、`-AppVersionName`、`-AppVersionCode` 覆盖自动探测值。

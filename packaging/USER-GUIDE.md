@@ -1,8 +1,8 @@
 # 华仔 AutoJs AI 能力包（安装与使用）
 
-本包为 Codex、Claude Code 与 ZCode 提供“华仔 AutoJs 工具箱 V5”的 6 个技能与 3 个 MCP 服务：设备通道（26 个工具，含 2 个 AutoJs 离线文档索引工具与 3 个知识库只读工具）、项目开发通道（16 个工具）与作者工具通道（教程录制，默认关闭，开启后 12 个工具）。本包已在 Codex 侧完成装机验收；通用模式已在豆包、WorkBuddy 完成技能与 stdio MCP 接入验证。Claude Code 与 ZCode 侧仍未随包验证。
+本包为 Codex、Claude Code 与 ZCode 提供“华仔 AutoJs 工具箱 V5”的 6 个技能与 3 个 MCP 服务：设备通道（26 个工具，含 2 个 AutoJs 离线文档索引工具与 3 个知识库只读工具）、项目开发通道（16 个工具）与作者工具通道（教程录制，默认关闭，开启后 12 个工具）。本包已在 Codex 侧完成装机验收；通用模式已在豆包完成技能与 stdio MCP 接入验证，WorkBuddy 已完成技能注册、MCP 需按「各客户端 MCP 注册位置」写入用户级 `~/.workbuddy/mcp.json` 并通过「交给 AI 配置」的注册态验收。Claude Code 与 ZCode 侧仍未随包验证。
 
-技能与 MCP 的定义本身不绑定任何客户端：只要目标工具能接入技能（`SKILL.md` 形式）、能配置 stdio MCP 服务，就不用等它出一份专属清单——豆包、WorkBuddy 以及其他同类工具都按「通用插件模式」自行接入；其中豆包、WorkBuddy 已完成验证。
+技能与 MCP 的定义本身不绑定任何客户端：只要目标工具能接入技能（`SKILL.md` 形式）、能配置 stdio MCP 服务，就不用等它出一份专属清单——豆包、WorkBuddy 以及其他同类工具都按「通用插件模式」自行接入；其中豆包的技能与 MCP、WorkBuddy 的技能已由用户侧验证，WorkBuddy 的 MCP 按「各客户端 MCP 注册位置」注册后以下一节的验收标准复核。注意：MCP 的“验证”指客户端把它注册进自己的 MCP 配置、并在新会话里出现原生工具，不等于“进程能启动”或“兜底通道能调用”；各客户端的注册位置见「通用插件模式」的「各客户端 MCP 注册位置」表。
 
 ## 获取渠道、官网与源码
 
@@ -106,19 +106,40 @@ Codex、Claude Code、ZCode 各有自己的插件清单，所以上面的章节�
 | 用途 | 位置 | 说明 |
 | --- | --- | --- |
 | 技能 | `skills\<技能名>\SKILL.md` | 标准 YAML frontmatter（`name` + `description`，技能名为 kebab-case）+ Markdown 正文 |
-| MCP 服务 | `.mcp.json` | 三个 server 的启动命令、参数、工作目录与环境变量；通用模式只认这一份 |
+| MCP 服务 | `.mcp.json` | 三个 server 的启动命令、参数、工作目录与环境变量；这是**模板与唯一事实来源**，用它换算成目标客户端的注册格式 |
 | 用户级配置 | `config.env.example` → `<用户主目录>\.hz-autojs-mcp\config.env` | 全部可调参数，与客户端无关，所有宿主共用同一份 |
 
 三个客户端专属目录（`.codex-plugin\`、`.claude-plugin\`、`.zcode-plugin\`）对通用模式没有意义，可以忽略。`.claude.mcp.json` 只在支持“插件根变量”的宿主里用，其中 `${CLAUDE_PLUGIN_ROOT}` 需要替换成解压目录的绝对路径；其余情况以 `.mcp.json` 为准，把里面的相对路径换成解压目录的绝对路径。
+
+**包内 `.mcp.json` 只是模板与唯一事实来源，不是最终注册位置**：除 Codex / Claude Code / ZCode 由各自插件机制读取对应清单外，其他客户端必须把三个 server 写进它自己的 MCP 注册文件，客户端才会加载。找不到对应条目时，先向用户确认该客户端的 MCP 配置路径，不要凭猜测写入。
+
+### 各客户端 MCP 注册位置
+
+| 客户端 | 注册到哪 | 格式与要求 | 是否需手动信任 |
+| --- | --- | --- | --- |
+| Codex | 插件机制（`codex plugin add`），包内 `.mcp.json` 由 Codex 按插件根解析 | 相对路径即可 | 是（启用插件/MCP 开关） |
+| Claude Code / ZCode | 插件清单，包内 `.claude.mcp.json` | `${CLAUDE_PLUGIN_ROOT}` 由宿主替换成解压目录 | 是 |
+| WorkBuddy | 用户级 `%USERPROFILE%\.workbuddy\mcp.json`（Windows）/ `$HOME/.workbuddy/mcp.json`；项目级 `<项目目录>\.workbuddy\mcp.json` | `{"mcpServers": { ... }}`；每个 server 用 `command` / `args` / `cwd` / `env`，路径写解压目录的**绝对路径** | 是（MCP 管理界面 Trust/启用 + 重启） |
+| 其他 / 未知 | 未知 | 未知 | 未知 |
+
+**WorkBuddy 注册说明**（注册位置与界面入口依据 WorkBuddy 官方文档「MCP」页；其余为用户侧 5.8.2 反查口径）：
+
+- 注册位置：用户级 `%USERPROFILE%\.workbuddy\mcp.json`（Windows）/ `$HOME/.workbuddy/mcp.json`，或项目级 `<项目目录>\.workbuddy\mcp.json`，结构为 `{"mcpServers": { ... }}`。官方界面入口：侧边栏「插件」→「MCP 服务器」→「配置 MCP」，保存后查看状态灯（🟢 连接成功 / 🔴 配置异常）。
+- 插件自带的 `.mcp.json` / `.claude.mcp.json` 不会被 WorkBuddy 读取，本地目录插件市场也不会被枚举；MCP 只有写进上面的 `mcp.json` 的 `mcpServers` 才会被加载。
+- `~/.workbuddy/mcp.json` 是**全局共享**文件（你的其他 MCP 也在里面）：写入前先读取现有内容，只新增/更新本插件的三个键，**不要整体覆盖**。
+- 每个 server 用 `command` / `args` / `cwd` / `env`，路径写解压目录的**绝对路径**；`cwd` 为反查确认可用的字段（官方示例只列了 `command` / `args` / `env`）。
+- 写入后若界面或会话未生效：在 MCP 管理界面确认该条目为启用（Trust）状态，然后**重启 WorkBuddy**（反查结论：配置在会话启动时读取一次）。
+- 三个通道的工具数应为 device **26** / project **16** / authoring **1**（作者工具默认关闭；开启后 12）。数量对不上即说明注册未生效。
+- 官方文档：<https://www.workbuddy.ai/docs/zh/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/MCP-Guide>。
 
 ### 交给 AI 配置（可直接复制）
 
 > 这个目录是「华仔 AutoJs AI 能力包」，为外部工具提供 6 个技能与 3 个 stdio MCP 服务。请按你所在客户端的方式接入，不要修改包内文件：
 >
 > 1. 技能：`skills\` 下有 `hz-autojs-device-operator`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer` 六个 `SKILL.md`。注册到你的技能目录；如果支持指向外部目录，就直接指向本包的 `skills\`，不要再复制一份，避免以后升级时两处漂移。
-> 2. MCP：读包根 `.mcp.json`，把三个 server 转成你所在客户端的 MCP 配置格式。启动命令是 `node`；参数里的相对路径换成解压目录的绝对路径；工作目录设为解压目录。
+> 2. MCP：读包根 `.mcp.json`，把三个 server 转成你所在客户端的 MCP 配置格式，并**写进该客户端自己的 MCP 注册位置**：WorkBuddy 是用户级 `%USERPROFILE%\.workbuddy\mcp.json` 的 `mcpServers`（先读现有内容合并，只增改本插件三个键，不要覆盖其他 MCP）；其他客户端先核对它的注册位置与字段，不要凭猜测写入。启动命令是 `node`；参数里的相对路径换成解压目录的绝对路径；工作目录设为解压目录。
 > 3. 配置：执行 `node <解压目录>\mcp\tools\mcp-config.mjs init` 生成用户级配置，再执行 `node <解压目录>\mcp\tools\mcp-config.mjs show`，把脱敏后的结果贴回来。
-> 4. 验证：列出已注册的技能与 MCP 工具，并先做一次只读的 `device_list` 调用确认链路。
+> 4. 验证（验收标准，缺一不可）：a) 客户端的 MCP 管理界面能看到 `hz-autojs-device-mcp`、`hz-autojs-project-mcp`、`hz-autojs-authoring-mcp` 三个条目；b) 新开的会话里工具列表出现 `mcp__hz-autojs-device-mcp__device_list` 等原生 MCP 工具（命名格式以客户端为准）；c) 用该原生工具成功调用一次 `device_list`。注意：**“MCP 进程能启动” ≠ “MCP 已被客户端注册”**——直接拉起进程、`tools/list` 返回正常或改用兜底直连，都不等于注册通过；a / b 不满足时不得报告“安装完成”，要说明卡在哪一步。
 > 5. 报告：说明你实际写入的配置文件位置与验证结果；做不到的项直接说“本客户端不支持”，不要静默跳过。
 
 ### 三个 MCP 通道
@@ -135,17 +156,18 @@ Codex、Claude Code、ZCode 各有自己的插件清单，所以上面的章节�
 
 ### 升级
 
-升级只做两件事：
+升级要做三件事：
 
-1. 把新版本的解压目录交给同一段指令，让 AI 把技能与 MCP 入口重新指向新目录（技能目录、`mcp\dist\*\index.js` 的绝对路径都要更新）。
-2. 执行 `node <新解压目录>\mcp\tools\mcp-config.mjs sync`，只补齐新版本新增的配置键。
+1. 把新版本的解压目录交给同一段指令，让 AI 把技能与 MCP 入口重新指向新目录：技能目录、`mcp\dist\*\index.js` 的绝对路径都要更新——**客户端的 MCP 注册文件**里三个 server 的 `args` / `cwd` 也要一并改指新目录（WorkBuddy 为 `~/.workbuddy/mcp.json`，其余客户端见「各客户端 MCP 注册位置」表）。
+2. 执行 `node <新解压目录>\mcp\tools\mcp-config.mjs sync`，只补齐新版本新增的配置键。注意：`mcp-config.mjs sync` **只处理用户级 `config.env`，不会更新客户端的 MCP 注册**，第 1 步必须单独完成。
+3. 重新执行「交给 AI 配置」里的验收标准：MCP 管理界面可见 + 新会话出现原生 `mcp__hz-autojs-*` 工具 + 原生工具调用成功。
 
-用户级配置 `config.env` 与状态目录（默认 `<用户主目录>\.hz-autojs-mcp\state`）都在用户主目录、不在包里，所以升级既不覆盖你的配置，也不会丢项目同步基线。确认新目录可用、旧目录不再被任何客户端引用之后再删除旧目录。
+升级采用「新目录 + 重新注册、不覆盖旧目录」时，如果漏掉第 1 步，客户端的注册会继续指向已删除的旧目录——MCP 静默失效且没有报错。用户级配置 `config.env` 与状态目录（默认 `<用户主目录>\.hz-autojs-mcp\state`）都在用户主目录、不在包里，所以升级既不覆盖你的配置，也不会丢项目同步基线。确认新目录可用、旧目录不再被任何客户端引用之后再删除旧目录。
 
 ### 通用模式的边界
 
 - 本包不为这些客户端提供专属清单或安装器，接入动作由目标客户端自己完成；本包只保证 `skills\`、`.mcp.json`、`mcp\dist\`、`mcp\tools\` 这几处的内容稳定。
-- 通用模式已在豆包、WorkBuddy 完成技能注册与 stdio MCP 接入验证；其他具名客户端仍需以目标客户端实际能力为准（例如是否支持 elicitation 确认卡、是否渲染 MCP `image` 内容块）。不支持 elicitation 时，需要确认的动作会自动转到 V5 确认页。
+- 通用模式的技能注册已在豆包、WorkBuddy 由用户侧验证；MCP 接入在豆包已由用户侧验证，WorkBuddy 的注册位置与注册态验收口径见「各客户端 MCP 注册位置」；其他具名客户端仍需以目标客户端实际能力为准（例如是否支持 elicitation 确认卡、是否渲染 MCP `image` 内容块）。不支持 elicitation 时，需要确认的动作会自动转到 V5 确认页。
 - 只支持 stdio 接入。需要远程 HTTP 的客户端请自行用 MCP 代理转换，本包不提供远程 MCP 端点。
 - 技能、MCP 的开关互相独立：启用技能不会自动启用对应 MCP，反之亦然。
 
@@ -190,7 +212,7 @@ node mcp\tools\mcp-config.mjs show    # 3. 脱敏查看当前生效值，以及�
 
 ### 交给 AI 安装时
 
-把这一节连同包一起给 AI 即可，它的动作应该是：解压 → 注册插件 → `mcp-config.mjs init` → `mcp-config.mjs show` 把结果贴回来 → 需要时再改配置文件。AI 不需要、也不应该去改插件目录里的 `.mcp.json` 或客户端缓存目录。
+把这一节连同包一起给 AI 即可，它的动作应该是：解压 → 注册插件 → 按「各客户端 MCP 注册位置」把三个 server 写进客户端自己的 MCP 注册文件 → `mcp-config.mjs init` → `mcp-config.mjs show` 把结果贴回来 → 需要时再改配置文件。AI 不需要、也不应该去改**插件目录内**的 `.mcp.json` 或客户端缓存目录；但**必须**写客户端的用户级 MCP 配置文件（WorkBuddy 为 `~/.workbuddy/mcp.json`，合并写入、不覆盖其他条目）——这是安装的必要步骤，不是可选项。
 
 ## 目标检测（端上识别，官方 APP 默认内置）
 
@@ -223,6 +245,7 @@ node mcp\tools\mcp-config.mjs show    # 3. 脱敏查看当前生效值，以及�
 ## 常见问题
 
 - **MCP 起不来或工具列表为空**：先确认 `node -v` ≥ 20，再确认 `HZ_V5_BASE_URL` 指向的 V5 服务端能在浏览器打开 `/api/health`。
+- **WorkBuddy 装完没有 `mcp__hz-autojs-*` 工具**：确认三个 server 已写进 `~/.workbuddy/mcp.json` 的 `mcpServers`（不是插件目录里的 `.mcp.json`），并在 MCP 管理界面 Trust/启用后重启 WorkBuddy。直接拉起 MCP 进程或兜底直连成功都不代表已注册；修复后按「交给 AI 配置」的验收标准自查。
 - **报缺少 dotenv 等依赖**：说明解压不完整，重新完整解压（不要只复制 `dist` 目录）。
 - **`marketplace add` 提示 "already added from a different source"**：先执行 `codex plugin marketplace remove hz-autojs-local`，再注册新目录。
 - **升级后行为没变化**：确认 `codex plugin list --json` 中的 `version` 已是新版本，并在**新任务**里验证。

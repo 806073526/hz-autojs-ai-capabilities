@@ -11,6 +11,9 @@ description: 面向华仔 AutoJs 工具箱 V5 的项目开发与部署：项目�
 
 skill 与 MCP 是两个独立开关：启用本 skill 不会自动启用 MCP。请同时在客户端启用
 `hz-autojs-project-mcp`；需要设备截图、布局或控制时再启用 `hz-autojs-device-mcp`。
+启用位置因客户端而异：先把 server 写进客户端自己的 MCP 注册位置（表见分发包根目录 `README.md`
+的「各客户端 MCP 注册位置」，源码仓库内为 `packaging/USER-GUIDE.md`），再在客户端里启用并在新会话
+核对原生 `mcp__hz-autojs-project-mcp__*` 工具出现——MCP 进程能启动不等于已被客户端注册。
 项目 MCP 不提供 `device_list` 和 `device_status`，设备上下文统一由设备 MCP 提供。
 
 ## 工具边界
@@ -59,6 +62,11 @@ skill 与 MCP 是两个独立开关：启用本 skill 不会自动启用 MCP。�
 - `project_run` 的目标是包含 `project.json` 的设备端项目目录，失败时没有回退成单文件脚本运行。
 
 ## 工具未注册时的兜底通道
+
+> ⚠️ 兜底是**故障降级**，不是默认路径：宿主本应支持 MCP 而没有 `mcp__hz-autojs-project-mcp` 时，
+> 先排查注册问题（注册位置见分发包根目录 `README.md` 的「各客户端 MCP 注册位置」，源码仓库内为
+> `packaging/USER-GUIDE.md`；包内 `.mcp.json` 只是模板）。使用兜底通道时**必须显式告知用户**
+> 「当前 MCP 未被客户端注册，正在用兜底直连，建议先修复注册」并给出修复步骤；不得静默走兜底。
 
 当会话工具列表里**没有** `mcp__hz-autojs-project-mcp` 时，改用插件自带的 stdio 直连器：
 

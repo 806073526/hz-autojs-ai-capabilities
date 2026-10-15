@@ -15,7 +15,7 @@
 
 没有完成的层级应明确写成未验证。
 
-包内 `README.md` 的「通用插件模式」章节是文档能力，不在上述 Codex 装机验收层级内：它不新增任何清单文件。豆包、WorkBuddy 已完成用户侧技能注册与 stdio MCP 接入验证，打包产物在 `plugin-release-manifest.json` 的 `universalModeAcceptance` 记录该结论；其余客户端仍以目标客户端实际能力为准。
+包内 `README.md` 的「通用插件模式」章节是文档能力，不在上述 Codex 装机验收层级内：它不新增任何清单文件。豆包的技能注册与 stdio MCP 接入、WorkBuddy 的技能注册已由用户侧验证；WorkBuddy 的 MCP 注册位置（`%USERPROFILE%\.workbuddy\mcp.json` 的 `mcpServers`，按 WorkBuddy 官方文档核对；合并写入、Trust 后重启为用户侧反查结论）与注册步骤已写入用户指南的「各客户端 MCP 注册位置」，其注册态尚无用户侧确认证据。通用模式的验收按「客户端注册态」判定（缺一不可）：客户端 MCP 管理界面可见三个 server 条目、新会话出现原生 `mcp__hz-autojs-*` 工具、原生工具调用成功；只拉起 MCP 进程或经兜底通道调用成功都不代表注册通过；升级时要同步更新注册路径，该要求同表。打包产物在 `plugin-release-manifest.json` 的 `universalModeAcceptance` 记录上述验证范围。其余客户端仍以目标客户端实际能力为准。
 
 ## 检查源码
 

@@ -50,7 +50,7 @@
 
 ZCode 的插件清单查找顺序是 `.zcode-plugin/plugin.json` → `.claude-plugin/plugin.json` → `.codex-plugin/plugin.json`；市场清单优先 `.claude-plugin/marketplace.json`，其次根目录 `marketplace.json`。市场条目 `source` 为 `"."` 时，ZCode 把市场根目录自身解析为插件根，因此解压目录同时是市场根与插件根。ZCode 运行时还会自动读取插件根 `.mcp.json`（Codex 的相对路径版本，ZCode 不会把 `cwd` 解析到插件根），所以 `.zcode-plugin/plugin.json` 显式声明 `mcpServers` 指向 `.claude.mcp.json`，以 manifest 覆盖同名 server 的入口。以上规则依据 ZCode 官方文档与 `zai-org/ZCode` 开源实现（`apps/zcode-cli/packages/adapters/src/plugins/marketplace.ts`、`mcp.ts`、`index.ts`）核对。
 
-上面的三份清单不是接入的唯一形态。`skills/<名>/SKILL.md` 与 `.mcp.json` 本身不绑定客户端，其他支持「技能 + MCP」的工具（豆包、WorkBuddy 等）按包内 `README.md` 的「通用插件模式」章节自行接入：技能指向 `skills/`，MCP 从 `.mcp.json` 抄启动命令并把相对路径换成解压目录的绝对路径。因此本仓库不为这些客户端新增专属清单，也不把某一份客户端清单当作通用事实来源；打包白名单与升级口径见 `packaging/README.md`。
+上面的三份清单不是接入的唯一形态。`skills/<名>/SKILL.md` 与 `.mcp.json` 本身不绑定客户端，其他支持「技能 + MCP」的工具（豆包、WorkBuddy 等）按包内 `README.md` 的「通用插件模式」章节自行接入：技能指向 `skills/`，MCP 从 `.mcp.json` 抄启动命令并把相对路径换成解压目录的绝对路径。但「包内 `.mcp.json` 是模板」不等于「写完模板就生效」：各客户端把 server 注册到哪里，必须在用户指南的「各客户端 MCP 注册位置」表里逐一给出（例如 WorkBuddy 只读取用户级 `~/.workbuddy/mcp.json` / 项目级 `<项目目录>/.workbuddy/mcp.json` 的 `mcpServers`，插件自带的 `.mcp.json` 不会被它读取）；注册态验收（MCP 管理界面条目 + 新会话原生工具 + 原生工具调用成功）与升级时要同步更新注册路径的口径同表。因此本仓库不为这些客户端新增专属清单，也不把某一份客户端清单当作通用事实来源；打包白名单与升级口径见 `packaging/README.md`。
 
 ## 知识库只读工具
 

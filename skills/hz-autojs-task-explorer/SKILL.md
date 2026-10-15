@@ -13,7 +13,7 @@ description: 把未知 Android 应用或游戏任务探索成可复用的领域�
 - 领域事实写入案例和候选技能；通用流程只保留在本技能。
 - 探索期间不直接改写稳定技能。先把发现写入运行记录，完成复跑后再提升为候选技能。
 - 不凭记忆补 AutoJs API。任何脚本 API 先用 `autojs_docs_search` / `autojs_docs_read` 确认。
-- 不把 ADB 当主链路。设备 MCP 工具可用时一律直接用 `mcp__hz_autojs_device_mcp__*`；只有 MCP 未注册、工具箱断开或 MCP 连续失败时才使用插件兜底通道，ADB 只在救援或环境配置场景使用。
+- 不把 ADB 当主链路。设备 MCP 工具可用时一律直接用 `mcp__hz_autojs_device_mcp__*`；只有 MCP 未注册、工具箱断开或 MCP 连续失败时才使用插件兜底通道，ADB 只在救援或环境配置场景使用。使用兜底通道时必须把「MCP 未被客户端注册」的事实与注册位置修复指引告知用户，不得静默降级（见 `mcp/docs/fallback-channel.md`）。
 - **坐标必须可移植**：案例、脚本、候选技能、项目请求里不允许出现没有归属说明的裸像素坐标对。坐标一律表达为契约（锚点 / 边缘 / 比例），在运行时解析成设备像素。详见 `references/cases/multi-resolution-adaptation.md`。
 
 ## 必需前置
@@ -278,7 +278,7 @@ node assets/tools/capture-evidence.mjs --run data/exploration/<runId> --verify
 
 ## 设备通道
 
-设备探索统一按 `references/cases/device-operation-channels.md` 的通道分级执行：优先设备 MCP，其次插件兜底调用器，最后 ADB / 模拟器控制台。任何通道都不绕过 V5 授权与风险判定。
+设备探索统一按 `references/cases/device-operation-channels.md` 的通道分级执行：优先设备 MCP，其次插件兜底调用器，最后 ADB / 模拟器控制台。任何通道都不绕过 V5 授权与风险判定。切换到兜底调用器或 ADB 时，必须把「当前 MCP 未被客户端注册 / 不可用，正在用兜底链路」告知用户，并给出注册位置修复指引（分发包 `README.md` 的「各客户端 MCP 注册位置」）；不要把兜底链路当作默认主链路。
 
 原生设备 MCP 可直接调用的操作类工具（优先用这些，不要先写兜底命令）：
 
