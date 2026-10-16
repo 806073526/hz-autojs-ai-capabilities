@@ -58,8 +58,8 @@ ZCode 的插件清单查找顺序是 `.zcode-plugin/plugin.json` → `.claude-pl
 设备入口的 3 个知识库工具直接调用 V5 的只读接口 `/api/mcp/knowledge/{search,read,assets}`，不占用设备、不提交设备任务：
 
 - `knowledge_search`：检索官方知识包与客户资料（V5 侧同一套分块 + BM25F + RRF 融合实现），结果带 `sourceType`；引用必须标明「来自官方教程」或「来自你的资料」。工具描述要求：用户问工具箱 V5 / 手机 APP / 网页端的用法、配置位置或操作步骤时，先检索官方教程并用 `knowledge_read` 读正文作答，不得凭记忆或插件自带说明回答。
-- `knowledge_read`：按 `docPath`（可带 `anchor`）分段读取正文与关联图片；单次窗口默认且最多 12000 字符，`offset` 指定起点，响应回带 `offset / maxChars / totalChars / nextOffset / truncated`，`truncated=true` 时用 `offset=nextOffset` 继续读，直到读完。客户资料命中 `anchor` 时只读该小节。返回的 `html` 是渲染副本，工具层不放进模型上下文。
-- `knowledge_assets`：按 `path` 取单张图片、或按 `docPath` 列文档 / 小节图片；内联的图片以 MCP image 块返回（单次最多 4 张），文本结构里不留 base64，超限图片只给路径与本地受控地址。
+- `knowledge_read`：按 `docPath`（可带 `anchor`）分段读取正文与关联图片；单次窗口默认且最多 12000 字符，`offset` 指定起点，响应回带 `offset / maxChars / totalChars / nextOffset / truncated`，`truncated=true` 时用 `offset=nextOffset` 继续读，直到读完。客户资料命中 `anchor` 时只读该小节。本段正文引用的图片会对齐成 `windowImages`（`path` + 图注）：官方文档按 Markdown 图片引用与 `assets[].assetPath` 匹配，客户资料小节级读取（`sectionFound=true`）直接采用该小节资产；`includeImages=true` 时把本段图片以内联 image 块一并返回（最多 4 张），不传则只给清单与提示。返回的 `html` 是渲染副本，工具层不放进模型上下文。
+- `knowledge_assets`：按 `path` 取单张、按 `paths` 批量取（最多 4 张）、或按 `docPath` 列文档 / 小节图片；内联的图片以 MCP image 块返回（单次最多 4 张），文本结构里不留 base64，超限图片只给路径与本地受控地址。`assets[].inline` 表示本次结果是否真的带回了该图；内容完全相同的图片按传输层口径合并为一个图片块，计数按真实下发块数；`imageHint` / `displayHint` 明确告知图片块会由客户端直接展示给用户（面向通用 agent 的看图诉求）。
 
 边界与依赖：
 

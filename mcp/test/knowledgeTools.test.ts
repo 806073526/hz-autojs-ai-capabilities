@@ -261,6 +261,10 @@ test("knowledge_assets 列文档图片时按 limit 内联图片并跳过未内�
   assert.equal(data.count, 3);
   assert.equal(data.imagesIncluded, 1);
   assert.equal((data.inlineAssets as JsonObject[]).length, 2);
+  const listedAssets = data.assets as JsonObject[];
+  assert.equal(listedAssets[0].inline, true, "本次内联成功的条目要标记 inline=true");
+  assert.equal(listedAssets[1].inline, false, "取图失败（inline=false）的条目不能标成已内联");
+  assert.equal(listedAssets[2].inline, false, "未纳入本次取图的条目不能标成已内联");
   assert.equal(JSON.stringify(outcome.data).includes("base64"), false, "文本结构里不允许出现 base64");
   assert.equal(JSON.stringify(outcome.data).includes("QUJD"), false, "图片内容不能进入文本块");
 });
@@ -311,4 +315,176 @@ test("V5 拒绝客户资料时原样返回失败信息", async () => {
 
   assert.equal(outcome.ok, false);
   assert.match(outcome.message, /不允许外部 AI 检索/);
+});
+
+test("knowledge_read 列出本段正文引用的图片并给出取图提示", async () => {
+  const { ctx, calls } = contextWith(() => ({
+    ok: true,
+    code: "OK",
+    message: "OK",
+    data: {
+      sourceType: "official",
+      title: "投屏与播放器",
+      docPath: "manual/模块手册/投屏/index.md",
+      markdown: "## 第 5 步 投屏设置\n\n![投屏设置：模式、协议与画质](images/step-05.png)\n\n点齿轮打开设置。\n\n![同一张图重复引用](images/step-05.png)\n",
+      assets: [
+        { path: "docs/manual/模块手册/投屏/images/step-01.png", assetPath: "images/step-01.png", mime: "image/png" },
+        {
+          path: "docs/manual/模块手册/投屏/images/step-05.png",
+          assetPath: "images/step-05.png",
+          mime: "image/png",
+          width: 1600,
+          height: 900,
+          url: "/api/knowledge/assets?path=docs%2Fmanual%2Fimages%2Fstep-05.png"
+        }
+      ],
+      truncated: false
+    }
+  }));
+
+  const outcome = await tool(ctx, "knowledge_read").handler({
+    docPath: "manual/模块手册/投屏/index.md",
+    anchor: "投屏设置：模式、协议与画质"
+  });
+
+  assert.equal(outcome.ok, true);
+  assert.equal(calls.length, 1, "未开 includeImages 时不额外取图");
+  assert.equal(outcome.images, undefined);
+  const windowImages = outcome.data?.windowImages as unknown as JsonObject[];
+  assert.equal(windowImages.length, 1, "重复引用只留一张，未被本段引用的素材不进清单");
+  assert.equal(windowImages[0].path, "docs/manual/模块手册/投屏/images/step-05.png");
+  assert.equal(windowImages[0].caption, "投屏设置：模式、协议与画质");
+  assert.match(String(outcome.data?.imageHint), /knowledge_assets/);
+});
+
+test("knowledge_read 开 includeImages 时把本段图片作为图片块返回", async () => {
+  const { ctx, calls } = contextWith((_path, query) => {
+    if (query?.docPath) {
+      return {
+        ok: true,
+        code: "OK",
+        message: "OK",
+        data: {
+          sourceType: "official",
+          title: "投屏与播放器",
+          docPath: "manual/模块手册/投屏/index.md",
+          markdown: "![入口](images/step-01.png)\n\n![设置](images/step-05.png)\n",
+          assets: [
+            { path: "docs/manual/模块手册/投屏/images/step-01.png", assetPath: "images/step-01.png", mime: "image/png" },
+            { path: "docs/manual/模块手册/投屏/images/step-05.png", assetPath: "images/step-05.png", mime: "image/png" }
+          ],
+          truncated: false
+        }
+      };
+    }
+    const path = String(query?.path ?? "");
+    return {
+      ok: true,
+      code: "OK",
+      message: "OK",
+      data: {
+        sourceType: "official",
+        path,
+        mime: "image/png",
+        inline: true,
+        base64: path.endsWith("step-01.png") ? "QUJD" : "REVG"
+      }
+    };
+  });
+
+  const outcome = await tool(ctx, "knowledge_read").handler({
+    docPath: "manual/模块手册/投屏/index.md",
+    includeImages: true
+  });
+
+  assert.equal(outcome.ok, true);
+  assert.equal(calls.length, 3, "1 次读正文 + 2 次取图");
+  assert.equal(outcome.images?.length, 2);
+  assert.equal((outcome.data as JsonObject).imagesIncluded, 2);
+  assert.equal(JSON.stringify(outcome.data).includes("base64"), false, "文本结构里不允许出现 base64");
+  assert.match(String((outcome.data as JsonObject).imageHint), /展示/);
+});
+
+test("knowledge_assets 支持按 paths 批量取图并给出展示提示", async () => {
+  const { ctx, calls } = contextWith((_path, query) => ({
+    ok: true,
+    code: "OK",
+    message: "OK",
+    data: {
+      sourceType: "official",
+      path: query?.path,
+      mime: "image/png",
+      inline: true,
+      base64: String(query?.path ?? "").endsWith("step-05.png") ? "REVG" : "QUJD"
+    }
+  }));
+
+  const outcome = await tool(ctx, "knowledge_assets").handler({
+    sourceType: "official",
+    paths: [
+      "docs/manual/模块手册/投屏/images/step-01.png",
+      "docs/manual/模块手册/投屏/images/step-05.png"
+    ]
+  });
+
+  assert.equal(outcome.ok, true);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].query?.path, "docs/manual/模块手册/投屏/images/step-01.png");
+  assert.equal(calls[1].query?.path, "docs/manual/模块手册/投屏/images/step-05.png");
+  assert.equal(outcome.images?.length, 2);
+  assert.match(String((outcome.data as JsonObject).displayHint), /展示/);
+});
+
+test("knowledge_assets 对内容相同的图片合并展示并如实计数", async () => {
+  const { ctx } = contextWith(() => ({
+    ok: true,
+    code: "OK",
+    message: "OK",
+    data: { sourceType: "official", mime: "image/png", inline: true, base64: "QUJD" }
+  }));
+
+  const outcome = await tool(ctx, "knowledge_assets").handler({
+    sourceType: "official",
+    paths: [
+      "docs/manual/模块手册/投屏/images/step-01.png",
+      "docs/manual/模块手册/投屏/images/step-02.png"
+    ]
+  });
+
+  assert.equal(outcome.images?.length, 1, "内容相同的图片只保留一个图片块");
+  const data = outcome.data as JsonObject;
+  assert.equal(data.imagesIncluded, 1, "计数按真实下发的图片块算");
+  assert.match(String(data.displayHint), /合并/);
+});
+
+test("knowledge_search 命中带图时提示取图展示", async () => {
+  const withImage = contextWith(() => ({
+    ok: true,
+    code: "OK",
+    message: "OK",
+    data: {
+      matches: [{
+        sourceType: "official",
+        docPath: "manual/模块手册/投屏/index.md",
+        assets: ["docs/manual/模块手册/投屏/images/step-05.png"],
+        imageReferences: [{ path: "docs/manual/模块手册/投屏/images/step-05.png" }]
+      }],
+      sourceTypes: ["official"],
+      customAllowed: true
+    }
+  }));
+
+  const outcome = await tool(withImage.ctx, "knowledge_search").handler({ query: "投屏设置" });
+  assert.equal(outcome.ok, true);
+  assert.match(String((outcome.data as JsonObject).imageHint), /knowledge_assets/);
+
+  const withoutImage = contextWith(() => ({
+    ok: true,
+    code: "OK",
+    message: "OK",
+    data: { matches: [{ sourceType: "official", docPath: "manual/demo/index.md" }], sourceTypes: ["official"], customAllowed: true }
+  }));
+
+  const plain = await tool(withoutImage.ctx, "knowledge_search").handler({ query: "纯文本文档" });
+  assert.equal((plain.data as JsonObject).imageHint, undefined, "没有关联图片时不下发取图提示");
 });
