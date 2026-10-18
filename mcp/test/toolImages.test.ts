@@ -24,6 +24,25 @@ test("detachToolImages 把 previewBase64 从文本结果里摘出来变成图片
   assert.ok(text.includes("/sdcard/a.png"), "普通元数据必须保留");
 });
 
+test("detachToolImages 保留新增图片元数据并继续兼容旧解析器", () => {
+  const coordinateTransform = { scaleX: 0.5, scaleY: 0.5, offsetX: 0, offsetY: 0 };
+  const { value, images } = detachToolImages({
+    previewFormat: "png",
+    previewBase64: PNG,
+    previewMode: "OBSERVE",
+    imageMode: "OBSERVE",
+    imageRef: { refId: "obs-1#observe", status: "AVAILABLE" },
+    coordinateTransform
+  });
+  assert.equal(images.length, 1);
+  assert.equal(images[0].mimeType, "image/png");
+  const text = JSON.stringify(value);
+  assert.ok(text.includes("OBSERVE"));
+  assert.ok(text.includes("obs-1#observe"));
+  assert.ok(text.includes("coordinateTransform"));
+  assert.ok(!text.includes("previewBase64"));
+});
+
 test("detachToolImages 按 previewFormat 推断 mimeType，png 不会被误标成 jpeg", () => {
   const { images } = detachToolImages({ previewFormat: "png", previewBase64: PNG });
   assert.equal(images.length, 1);

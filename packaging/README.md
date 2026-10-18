@@ -20,7 +20,7 @@
 | `mcp/workbuddy.mcp.json` | WorkBuddy 侧三个 MCP 入口；用 `${CODEBUDDY_PLUGIN_ROOT}` 绝对化入口路径与工作目录。WorkBuddy 引擎除清单 `mcpServers` 外还会扫描插件内 `mcp/*.json`，本文件按文件名序最后加载，覆盖根 `.mcp.json` 的相对路径版本（放插件根反而会被覆盖，故不提供根级 `.workbuddy.mcp.json`） |
 | `.claude-plugin/plugin.json`、`.claude.mcp.json` | Claude Code 插件清单与 MCP 启动入口；`.claude.mcp.json` 用 `${CLAUDE_PLUGIN_ROOT}` 绝对化入口路径，同时被 ZCode 清单引用 |
 | `.claude-plugin/marketplace.json` | ZCode 与 Claude Code 共用的本地市场清单；条目 `source` 为 `"."`，把解压目录自身解析为插件根 |
-| `skills/**` | 六个技能（设备操作、脚本编写、项目开发、任务探索、自动化项目生成、检测模型训练） |
+| `skills/**` | 仅装配正式六项技能（设备操作、脚本编写、项目开发、任务探索、自动化项目生成、检测模型训练）；按正式技能白名单逐目录复制，不复制整个 `skills/` 目录 |
 
 | `mcp/dist/**` | 已编译的 stdio 入口，用户不需要 TypeScript 工具链 |
 | `mcp/node_modules/**` | 运行时依赖（`@modelcontextprotocol/sdk`、`dotenv`），裁剪为生产依赖 |
@@ -39,6 +39,7 @@
 - `mcp/docs/autojs/**`：522 个 VuePress 原始文件（94 个 HTML 页面 + 资源，约 16 MB），只用于重建索引，运行期不需要，用户不需要。
 - `mcp/src/**`、`mcp/scripts/**`、`mcp/tsconfig.json`、`mcp/test/**`、`mcp/logs/**`。
 - `config.env`（真实用户配置）：只存在于用户主目录，绝不进包；包里只带 `config.env.example` 模板。
+- `skills/hz-autojs-video-producer/**`：仅本地使用的视频制作技能，不进入 Git、正式插件包或公开源码镜像。
 - `examples/**`、`.gitignore`、`.git/**`、`packaging/**`。
 
 需要发源码时另出源码包（本脚本不产出），不得把本白名单放宽到“整目录压缩”。
