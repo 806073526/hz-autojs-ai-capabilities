@@ -28,6 +28,8 @@ skill 与 MCP 是两个独立开关：启用本 skill 不会自动启用 MCP。�
 
 - 设备访问按设备授权：设备访问 token 与同设备 MCP grant 都可用，两个 MCP 共享同一授权窗口；不要保存设备明文密码。
 - 同步默认不删除远端文件；`mirror_delete` 必须显式请求，且不能由 `full` 隐式触发。
+- `project_sync_plan` / `project_sync_push` 只读取 `localRoot` 根目录的 `.hzignore`，不搜索父目录或子目录。每行是精确根相对路径，命中路径及全部子树，区分大小写，支持空行和 `#` 注释；通配符、否定规则和非法路径记录 warning 后跳过。`.hzignore` 自身始终保留，配置不可读时停止同步。
+- `.hzignore` 命中的旧基线路径不进入删除候选，`mirrorDelete` 不删除对应远端文件；默认排除与显式 `excludes` 始终合并。同步结果必须回传 `transferSummary` 的 `totalBytes`、`fileCount`、`excludedDirectories`、`configFound` 和 `warnings`，用于先判断是否误选了过大项目。
 - 逐文件返回成功、跳过、冲突和失败；部分成功不得写成整体成功。
 - 一批同步只提交一个设备任务（V5「目录下发」，设备端只弹一次窗口）。不得改回「一个文件一个任务」：设备端会对每个文件弹一次「文件下发」窗口，实测 811 个文件弹 811 次、排队约 13 分钟。
 - 完整同步基线只在 MCP 客户端本地状态目录；V5 只保存映射记录、远端根和最近同步摘要。
@@ -44,7 +46,7 @@ skill 与 MCP 是两个独立开关：启用本 skill 不会自动启用 MCP。�
 
 ## 推荐流程
 
-1. `project_sync_plan` 计算新增、修改、删除候选和冲突。
+1. `project_sync_plan` 计算新增、修改、删除候选和冲突，并先核对 `transferSummary.totalBytes` 与 `excludedDirectories`；项目明显过大时先修正 `localRoot` 或根 `.hzignore`，不要直接推送。
 2. `project_sync_push` 按显式清单执行 `full` 或 `incremental`。
 3. Node 项目缺依赖时先 `project_install_dependencies` 补齐（已有 `node_modules` 会跳过），再 `project_run` 运行设备端项目；或 `project_build` 先打包再把产物安装到设备。
 4. `project_deploy_status` 与 `project_task_logs` 读取状态和裁剪后的日志。
@@ -53,7 +55,7 @@ skill 与 MCP 是两个独立开关：启用本 skill 不会自动启用 MCP。�
 
 ## 交付前自查
 
-- 同步前跑过 `project_sync_plan`，推送按显式清单；`mirror_delete` 只有显式要求才开启；
+- 同步前跑过 `project_sync_plan`，核对过 `transferSummary` 的传输大小和排除目录，推送按显式清单；`mirror_delete` 只有显式要求才开启；根 `.hzignore` 规则只按源根解释；
 - 一批同步只提交一个设备任务，没有拆成逐文件任务；
 - 大文件同步中断后重跑同一批清单即可续传，没有改用分小批次或手工切文件绕过超时；
 - 打包参数未显式传入即沿用 `project.json`；本次改过能力开关（`openImageModule` / `openNodeJs` / `plugins` / `abis`）的，已核对产物；

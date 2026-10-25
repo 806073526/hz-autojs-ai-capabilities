@@ -39,7 +39,7 @@
 - `mcp/docs/autojs/**`：522 个 VuePress 原始文件（94 个 HTML 页面 + 资源，约 16 MB），只用于重建索引，运行期不需要，用户不需要。
 - `mcp/src/**`、`mcp/scripts/**`、`mcp/tsconfig.json`、`mcp/test/**`、`mcp/logs/**`。
 - `config.env`（真实用户配置）：只存在于用户主目录，绝不进包；包里只带 `config.env.example` 模板。
-- `skills/hz-autojs-video-producer/**`：仅本地使用的视频制作技能，不进入 Git、正式插件包或公开源码镜像。
+- `skills/hz-autojs-video-producer/**`：已迁至同级独立视频仓库 `E:/selfWork/video-projects/skills/hz-autojs-video-producer/`，由该仓库版本化；仍不进入本产品仓库 Git、正式插件包或插件公开源码镜像。
 - `examples/**`、`.gitignore`、`.git/**`、`packaging/**`。
 
 需要发源码时另出源码包（本脚本不产出），不得把本白名单放宽到“整目录压缩”。

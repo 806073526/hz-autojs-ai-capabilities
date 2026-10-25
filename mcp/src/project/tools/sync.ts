@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { mkdir, open, readdir, readFile, stat, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { JsonObject, McpToolDefinition, ToolContext, ToolOutcome } from "../../core/types.js";
 import { executeCanonicalWithConfirmation } from "../../core/pendingConfirmation.js";
 import {
@@ -50,8 +50,23 @@ interface ResumableUploadStatusPayload {
   fileId?: number | string;
 }
 
+interface TransferSummary {
+  totalBytes: number;
+  fileCount: number;
+  excludedDirectories: string[];
+  configFound: boolean;
+  warnings: string[];
+}
+
+interface HzIgnoreConfig {
+  rules: string[];
+  configFound: boolean;
+  warnings: string[];
+}
+
 const BASELINE_VERSION = 1;
 const DEFAULT_EXCLUDES = "node_modules,.git,dist,build,logs,target";
+const HZIGNORE_FILE = ".hzignore";
 /** 公共库里的项目暂存根；整批下发结束后立即清理，不长期占用公共库。 */
 const PUSH_STAGING_PREFIX = "mcp-project-sync";
 /** 等待设备端整批下发完成的默认上限。 */
@@ -71,7 +86,7 @@ export function syncTools(ctx: ToolContext): McpToolDefinition[] {
   return [
     createTool(
       "project_sync_plan",
-      "按本地文件相对最近一次同步基线的变化计算差异（新增/修改/删除候选/冲突），只计算不写设备；不读取设备端实际内容，设备端外部改动不参与差异。",
+      "按本地文件相对最近一次同步基线的变化计算差异（新增/修改/删除候选/冲突），只计算不写设备；不读取设备端实际内容，设备端外部改动不参与差异。仅读取 localRoot 根目录单个 .hzignore（不读取子目录，也不向父目录搜索）：每行是精确根相对路径，命中路径自身及全部子树，区分大小写；空行和 # 注释忽略，非法或通配符规则记录 warning 后跳过。默认排除始终与显式 excludes 合并。返回 transferSummary，包含 totalBytes、fileCount、excludedDirectories、configFound、warnings。",
       objectSchema({
         localRoot: { type: "string", description: "本地项目根绝对路径。" },
         deviceId: DEVICE_ID_PROPERTY,
@@ -86,7 +101,7 @@ export function syncTools(ctx: ToolContext): McpToolDefinition[] {
 
     createTool(
       "project_sync_push",
-      "按显式文件清单执行同步；mode 支持 full 和 incremental，mirror_delete 必须显式开启。只下发本地相对基线发生变化的文件（不检测设备端外部改动）。整批只提交一个设备任务，设备端只弹一次「目录下发」窗口。超过 HZ_MCP_UPLOAD_RESUMABLE_THRESHOLD_BYTES 的大文件自动走分片/断点续传上传，调用被打断后重跑同一批清单会从已完成分片继续。",
+      "按显式文件清单执行同步；mode 支持 full 和 incremental，mirror_delete 必须显式开启。只下发本地相对基线发生变化的文件（不检测设备端外部改动）。仅读取 localRoot 根目录单个 .hzignore（不读取子目录，也不向父目录搜索），命中路径及子树；默认排除始终与显式 excludes 合并。full 只上传扫描后保留的文件；incremental 中命中 .hzignore 的请求进入 skipped；mirrorDelete 不删除被 .hzignore 忽略的旧基线远端文件。返回 transferSummary，包含 totalBytes、fileCount、excludedDirectories、configFound、warnings。整批只提交一个设备任务，设备端只弹一次「目录下发」窗口。超过 HZ_MCP_UPLOAD_RESUMABLE_THRESHOLD_BYTES 的大文件自动走分片/断点续传上传，调用被打断后重跑同一批清单会从已完成分片继续。",
       objectSchema({
         localRoot: { type: "string" },
         deviceId: DEVICE_ID_PROPERTY,
@@ -136,7 +151,8 @@ async function planSync(_ctx: ToolContext, args: JsonObject): Promise<ToolOutcom
     else if (known.hash !== entry.hash) modified.push(path);
     else unchanged.push(path);
   }
-  const deletedCandidates = Object.keys(previous).filter(path => !local.files[path]);
+  const deletedCandidates = Object.keys(previous).filter(path =>
+    !local.files[path] && !isHzIgnored(path, local.hzIgnoreRules));
   const conflict: JsonObject[] = [];
   if (!local.files["project.json"]) {
     conflict.push({ path: "project.json", reason: "本地项目根缺少 project.json。" });
@@ -153,6 +169,7 @@ async function planSync(_ctx: ToolContext, args: JsonObject): Promise<ToolOutcom
     deletedCandidates,
     unchanged,
     conflict,
+    transferSummary: local.transferSummary,
     totals: {
       added: added.length,
       modified: modified.length,
@@ -198,6 +215,10 @@ async function pushSync(ctx: ToolContext, args: JsonObject): Promise<ToolOutcome
     const relativePath = normalizeRelative(raw);
     if (!relativePath) {
       failed.push({ path: raw, reason: "非法路径" });
+      continue;
+    }
+    if (isHzIgnored(relativePath, local.hzIgnoreRules)) {
+      skipped.push({ path: relativePath, reason: "被 .hzignore 排除" });
       continue;
     }
     const entry = local.files[relativePath];
@@ -289,7 +310,8 @@ async function pushSync(ctx: ToolContext, args: JsonObject): Promise<ToolOutcome
   }
 
   if (mirrorDelete) {
-    for (const relativePath of Object.keys(previous).filter(item => !local.files[item])) {
+    for (const relativePath of Object.keys(previous).filter(item =>
+      !local.files[item] && !isHzIgnored(item, local.hzIgnoreRules))) {
       const removal = await executeCanonicalWithConfirmation(ctx, "file.device.operation", {
         deviceId,
         operation: "DELETE",
@@ -350,6 +372,7 @@ async function pushSync(ctx: ToolContext, args: JsonObject): Promise<ToolOutcome
     awaiting,
     deviceTask,
     staging,
+    transferSummary: local.transferSummary,
     lastResult
   };
   return overall
@@ -387,30 +410,118 @@ async function scanLocal(
   localRoot: string,
   excludes: string[],
   maxEntries: number
-): Promise<{ ok: true; files: Record<string, BaselineEntry> } | { ok: false; outcome: ToolOutcome }> {
+): Promise<{
+  ok: true;
+  files: Record<string, BaselineEntry>;
+  hzIgnoreRules: string[];
+  transferSummary: TransferSummary;
+} | { ok: false; outcome: ToolOutcome }> {
   const info = await stat(localRoot).catch(() => undefined);
   if (!info || !info.isDirectory()) {
     return { ok: false, outcome: fail("LOCAL_ROOT_INVALID", `本地项目根不存在或不是目录: ${localRoot}`) };
   }
+  const hzIgnore = await loadHzIgnore(localRoot);
+  if (!hzIgnore.ok) return { ok: false, outcome: hzIgnore.outcome };
+
   const files: Record<string, BaselineEntry> = {};
+  const excludedDirectories = new Set<string>();
   let count = 0;
+  let totalBytes = 0;
   const walk = async (dir: string): Promise<void> => {
     const entries = await readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (count >= maxEntries) return;
       const absolute = join(dir, entry.name);
       const relativePath = toPosix(relative(localRoot, absolute));
-      if (isExcluded(relativePath, excludes)) continue;
+      const isConfigFile = relativePath === HZIGNORE_FILE;
+      if (!isConfigFile && isHzIgnored(relativePath, hzIgnore.rules)) {
+        if (entry.isDirectory()) excludedDirectories.add(relativePath);
+        continue;
+      }
+      if (!isConfigFile && isExcluded(relativePath, excludes)) {
+        if (entry.isDirectory()) excludedDirectories.add(relativePath);
+        continue;
+      }
       if (entry.isDirectory()) await walk(absolute);
       else if (entry.isFile()) {
         const buffer = await readFile(absolute);
         files[relativePath] = { hash: createHash("sha256").update(buffer).digest("hex"), size: buffer.length };
+        totalBytes += buffer.length;
         count += 1;
       }
     }
   };
   await walk(localRoot);
-  return { ok: true, files };
+  return {
+    ok: true,
+    files,
+    hzIgnoreRules: hzIgnore.rules,
+    transferSummary: {
+      totalBytes,
+      fileCount: count,
+      excludedDirectories: [...excludedDirectories].sort(),
+      configFound: hzIgnore.configFound,
+      warnings: hzIgnore.warnings
+    }
+  };
+}
+
+async function loadHzIgnore(
+  localRoot: string
+): Promise<({ ok: true } & HzIgnoreConfig) | { ok: false; outcome: ToolOutcome }> {
+  const configPath = join(localRoot, HZIGNORE_FILE);
+  let content: string;
+  try {
+    content = await readFile(configPath, "utf8");
+  } catch (error) {
+    const code = fileErrorCode(error);
+    if (code === "ENOENT") {
+      return { ok: true, rules: [], configFound: false, warnings: [] };
+    }
+    const suffix = code ? ` (${code})` : "";
+    return {
+      ok: false,
+      outcome: fail("HZIGNORE_READ_FAILED", `读取根目录 .hzignore 失败，已停止同步: ${configPath}${suffix}`, {
+        path: configPath
+      })
+    };
+  }
+  const parsed = parseHzIgnore(content);
+  return { ok: true, rules: parsed.rules, configFound: true, warnings: parsed.warnings };
+}
+
+function parseHzIgnore(content: string): Pick<HzIgnoreConfig, "rules" | "warnings"> {
+  const rules = new Set<string>();
+  const warnings: string[] = [];
+  const lines = content.replace(/^\uFEFF/, "").split(/\r?\n/);
+  for (let index = 0; index < lines.length; index++) {
+    const raw = lines[index].trim();
+    if (!raw || raw.startsWith("#")) continue;
+    const reason = invalidHzIgnoreReason(raw);
+    if (reason) {
+      warnings.push(`${HZIGNORE_FILE} 第 ${index + 1} 行已跳过（${reason}）: ${raw}`);
+      continue;
+    }
+    rules.add(raw.replace(/\\/g, "/").replace(/\/+/g, "/").replace(/\/+$/, ""));
+  }
+  return { rules: [...rules], warnings };
+}
+
+function invalidHzIgnoreReason(rule: string): string | undefined {
+  if (rule.startsWith("!")) return "不支持否定规则";
+  if (/[*?\[\]]/.test(rule)) return "不支持通配符或正则字符";
+  if (/^[A-Za-z]:/.test(rule) || isAbsolute(rule) || /^[\\/]/.test(rule)) {
+    return "不支持绝对路径或盘符路径";
+  }
+  if (rule.split(/[\\/]+/).some(segment => segment === "." || segment === "..")) {
+    return "不支持 . 或 .. 路径段";
+  }
+  return undefined;
+}
+
+function fileErrorCode(error: unknown): string {
+  if (!error || typeof error !== "object" || !("code" in error)) return "";
+  return String((error as { code?: unknown }).code || "");
 }
 
 async function uploadOne(
@@ -746,16 +857,20 @@ async function writeBaseline(path: string, baseline: BaselineFile): Promise<void
 }
 
 function parseExcludes(value: string | undefined): string[] {
-  return (value || DEFAULT_EXCLUDES)
-    .split(/[,;，；\r\n]+/)
-    .map(item => item.trim())
-    .filter(Boolean);
+  const defaults = DEFAULT_EXCLUDES.split(/[,;，；\r\n]+/).map(item => item.trim()).filter(Boolean);
+  const explicit = (value || "").split(/[,;，；\r\n]+/).map(item => item.trim()).filter(Boolean);
+  return [...new Set([...defaults, ...explicit])];
 }
 
 function isExcluded(relativePath: string, excludes: string[]): boolean {
   return excludes.some(pattern => relativePath === pattern
     || relativePath.startsWith(`${pattern}/`)
     || relativePath.includes(`/${pattern}/`));
+}
+
+function isHzIgnored(relativePath: string, rules: string[]): boolean {
+  if (relativePath === HZIGNORE_FILE) return false;
+  return rules.some(rule => relativePath === rule || relativePath.startsWith(`${rule}/`));
 }
 
 function normalizeRelative(value: string): string | undefined {

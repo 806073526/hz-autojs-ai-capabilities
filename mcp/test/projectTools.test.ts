@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { buildProjectTools } from "../src/project/tools/index.ts";
 import type { AppConfig } from "../src/core/config.ts";
@@ -75,6 +75,27 @@ function projectContext(
     supportsElicitation: () => false,
     requestConfirmation: async () => "decline"
   };
+}
+
+let tempProjectSequence = 0;
+
+function tempProjectRoot(label: string): string {
+  return join(tmpdir(), `hz-project-${label}-${Date.now()}-${tempProjectSequence++}`);
+}
+
+async function createProjectFiles(root: string, files: Record<string, string>): Promise<void> {
+  for (const [relativePath, content] of Object.entries(files)) {
+    const absolute = join(root, relativePath);
+    await mkdir(dirname(absolute), { recursive: true });
+    await writeFile(absolute, content, "utf8");
+  }
+}
+
+function transferSummaryOf(data: JsonObject | undefined): JsonObject {
+  assert.ok(data);
+  const summary = data.transferSummary;
+  assert.ok(summary && typeof summary === "object" && !Array.isArray(summary));
+  return summary as JsonObject;
 }
 
 test("project_sync_push 整批一次下发：上传到暂存目录、只提交一个 FILE_PUSH 任务、下发后清暂存", async () => {
@@ -175,6 +196,418 @@ test("project_sync_push 大文件分片续传：跳过已上传分片、补齐�
   assert.equal(complete?.body?.sha256, createHash("sha256").update(content).digest("hex"));
   assert.match(String(complete?.body?.relativePath),
     /^mcp-project-sync\/resume-[0-9a-f]{12}\/[0-9a-f]{16}\/lib\/big\.bin$/);
+});
+
+test("project_sync_plan 使用根 .hzignore 跳过目录子树并汇总传输大小", async () => {
+  const localRoot = tempProjectRoot("hzignore-subtree");
+  const hzignoreText = "# ignore internals\n\nprivate\n";
+  await createProjectFiles(localRoot, {
+    ".hzignore": hzignoreText,
+    "project.json": "{}",
+    "private/a.txt": "secret",
+    "private/nested/b.txt": "nested",
+    "src/main.js": "ok"
+  });
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/hzignore",
+    stateDir: tempProjectRoot("hzignore-state"),
+    maxEntries: 100
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), [".hzignore", "project.json", "src/main.js"].sort());
+  assert.equal((data.deletedCandidates as string[]).length, 0);
+  const summary = transferSummaryOf(data);
+  assert.equal(summary.totalBytes, Buffer.byteLength(hzignoreText) + 4);
+  assert.equal(summary.fileCount, 3);
+  assert.deepEqual(summary.excludedDirectories, ["private"]);
+  assert.equal("ignoredFileCount" in summary, false);
+  assert.equal(summary.configFound, true);
+  assert.deepEqual(summary.warnings, []);
+});
+
+test(".hzignore 自身始终保留，即使规则或显式 excludes 命中", async () => {
+  const localRoot = tempProjectRoot("hzignore-self");
+  await createProjectFiles(localRoot, {
+    ".hzignore": ".hzignore\n",
+    "project.json": "{}"
+  });
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/self",
+    excludes: ".hzignore",
+    stateDir: tempProjectRoot("hzignore-self-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), [".hzignore", "project.json"].sort());
+  const summary = transferSummaryOf(data);
+  assert.deepEqual(summary.excludedDirectories, []);
+  assert.equal("ignoredFileCount" in summary, false);
+});
+
+test("子目录 .hzignore 不作为配置生效", async () => {
+  const localRoot = tempProjectRoot("hzignore-nested");
+  await createProjectFiles(localRoot, {
+    "project.json": "{}",
+    "sub/.hzignore": "secret.txt\n",
+    "sub/secret.txt": "keep"
+  });
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/nested-ignore",
+    stateDir: tempProjectRoot("hzignore-nested-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), ["project.json", "sub/.hzignore", "sub/secret.txt"].sort());
+  assert.equal(transferSummaryOf(data).configFound, false);
+});
+
+test("localRoot 为子目录时不读取父目录 .hzignore", async () => {
+  const parentRoot = tempProjectRoot("hzignore-parent");
+  await createProjectFiles(parentRoot, {
+    ".hzignore": "blocked\n",
+    "child/project.json": "{}",
+    "child/blocked/a.txt": "keep"
+  });
+  const localRoot = join(parentRoot, "child");
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/child-root",
+    stateDir: tempProjectRoot("hzignore-parent-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), ["blocked/a.txt", "project.json"].sort());
+  assert.equal(transferSummaryOf(data).configFound, false);
+});
+
+test(".hzignore 规则按根路径和大小写精确匹配，不误伤 foo 与 foobar", async () => {
+  const localRoot = tempProjectRoot("hzignore-boundary");
+  await createProjectFiles(localRoot, {
+    ".hzignore": "foo\nCase/Target.txt\ndup//segment\n",
+    "project.json": "{}",
+    "foo/a.txt": "excluded",
+    "duplicate-keep.txt": "keep",
+    "dup/segment/a.txt": "excluded",
+    "foobar/b.txt": "keep",
+    "Case/target.txt": "keep"
+  });
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/boundary",
+    stateDir: tempProjectRoot("hzignore-boundary-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), [".hzignore", "Case/target.txt", "duplicate-keep.txt", "foobar/b.txt", "project.json"].sort());
+  const summary = transferSummaryOf(data);
+  assert.deepEqual(summary.excludedDirectories, ["dup/segment", "foo"]);
+  assert.equal("ignoredFileCount" in summary, false);
+});
+
+test(".hzignore 非法与通配符规则记录 warning 后跳过，不阻断同步", async () => {
+  const localRoot = tempProjectRoot("hzignore-invalid");
+  const invalidRules = [
+    "*.log",
+    "cache?",
+    "name[0]",
+    "/absolute",
+    "C:\\drive.txt",
+    "C:relative.txt",
+    "a/./b",
+    "a/../b",
+    "!keep.txt"
+  ];
+  await createProjectFiles(localRoot, {
+    ".hzignore": invalidRules.join("\n") + "\nvalid\n",
+    "project.json": "{}",
+    "keep.log": "keep",
+    "valid/a.txt": "ignored"
+  });
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/invalid-rules",
+    stateDir: tempProjectRoot("hzignore-invalid-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), [".hzignore", "keep.log", "project.json"].sort());
+  const warnings = transferSummaryOf(data).warnings as string[];
+  assert.equal(warnings.length, invalidRules.length);
+  assert.ok(warnings.every(item => item.includes(".hzignore")));
+});
+
+test(".hzignore 存在但读取失败时停止同步且不发起上传", async () => {
+  const localRoot = tempProjectRoot("hzignore-unreadable");
+  await createProjectFiles(localRoot, {
+    "project.json": "{}",
+    "lib/main.js": "module.exports = 1;"
+  });
+  await mkdir(join(localRoot, ".hzignore"));
+  const calls: JsonObject[] = [];
+  const ctx = projectContext(calls, () => ({ ok: true, code: "OK", message: "OK", data: { taskId: "unexpected" } }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_push");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/unreadable",
+    mode: "full",
+    stateDir: tempProjectRoot("hzignore-unreadable-state")
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "HZIGNORE_READ_FAILED");
+  assert.match(result.message, /\.hzignore/);
+  assert.equal(calls.some(call => call.toolName === "upload"), false);
+  assert.equal(calls.some(call => call.toolName === "file.device.push"), false);
+});
+
+test("显式 excludes 与默认排除合并而不是覆盖", async () => {
+  const localRoot = tempProjectRoot("exclude-merge");
+  await createProjectFiles(localRoot, {
+    "project.json": "{}",
+    "keep.txt": "keep",
+    "node_modules/pkg/index.js": "default excluded",
+    "custom/cache.txt": "explicit excluded"
+  });
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_plan");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/exclude-merge",
+    excludes: "custom",
+    stateDir: tempProjectRoot("exclude-merge-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  assert.deepEqual([...(data.added as string[])].sort(), ["keep.txt", "project.json"].sort());
+  assert.deepEqual(transferSummaryOf(data).excludedDirectories, ["custom", "node_modules"]);
+});
+
+test("project_sync_push full 返回传输摘要且只上传保留文件", async () => {
+  const localRoot = tempProjectRoot("push-summary");
+  const hzignoreText = "dist\n";
+  await createProjectFiles(localRoot, {
+    ".hzignore": hzignoreText,
+    "project.json": "{}",
+    "keep.js": "keep",
+    "dist/bundle.js": "ignored"
+  });
+  const calls: JsonObject[] = [];
+  const ctx = projectContext(calls, () => ({ ok: true, code: "OK", message: "OK", data: { taskId: "push-summary" } }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_push");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/push-summary",
+    mode: "full",
+    stateDir: tempProjectRoot("push-summary-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  const summary = transferSummaryOf(data);
+  assert.equal(summary.totalBytes, Buffer.byteLength(hzignoreText) + 6);
+  assert.equal(summary.fileCount, 3);
+  assert.deepEqual(summary.excludedDirectories, ["dist"]);
+  assert.equal("ignoredFileCount" in summary, false);
+  const uploads = calls.filter(call => call.toolName === "upload");
+  assert.equal(uploads.length, 3);
+  assert.equal(uploads.some(call => String(call.query?.relativePath || "").endsWith("/dist/bundle.js")), false);
+});
+
+test("project_sync_push incremental 将 .hzignore 命中路径放入 skipped", async () => {
+  const localRoot = tempProjectRoot("push-incremental-ignored");
+  await createProjectFiles(localRoot, {
+    ".hzignore": "ignored\n",
+    "project.json": "{}",
+    "ignored/secret.txt": "do not transfer"
+  });
+  const calls: JsonObject[] = [];
+  const ctx = projectContext(calls, () => ({ ok: true, code: "OK", message: "OK", data: { taskId: "unexpected" } }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_push");
+  assert.ok(tool);
+
+  const result = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot: "/sdcard/appSync/incremental-ignored",
+    mode: "incremental",
+    files: ["ignored/secret.txt"],
+    stateDir: tempProjectRoot("push-incremental-ignored-state")
+  });
+
+  assert.equal(result.ok, true);
+  const data = result.data as JsonObject;
+  const skipped = data.skipped as JsonObject[];
+  assert.equal(skipped.length, 1);
+  assert.equal(skipped[0].path, "ignored/secret.txt");
+  assert.match(String(skipped[0].reason), /\.hzignore/);
+  assert.deepEqual(data.failed, []);
+  assert.equal(calls.some(call => call.toolName === "upload"), false);
+});
+
+test("mirrorDelete 保留旧基线中的 .hzignore 路径且不生成删除候选", async () => {
+  const localRoot = tempProjectRoot("mirror-ignore");
+  const stateDir = tempProjectRoot("mirror-ignore-state");
+  const remoteRoot = "/sdcard/appSync/mirror-ignore";
+  await createProjectFiles(localRoot, {
+    "project.json": "{}",
+    "old/secret.txt": "keep remote"
+  });
+  const calls: JsonObject[] = [];
+  const ctx = projectContext(calls, () => ({ ok: true, code: "OK", message: "OK", data: { taskId: "mirror" } }));
+  const tools = buildProjectTools(ctx);
+  const pushTool = tools.find(item => item.name === "project_sync_push");
+  const planTool = tools.find(item => item.name === "project_sync_plan");
+  assert.ok(pushTool);
+  assert.ok(planTool);
+
+  const initial = await pushTool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot,
+    mode: "incremental",
+    files: ["old/secret.txt"],
+    stateDir
+  });
+  assert.equal(initial.ok, true);
+
+  await createProjectFiles(localRoot, { ".hzignore": "old\n" });
+  const plan = await planTool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot,
+    stateDir
+  });
+  assert.equal(plan.ok, true);
+  assert.equal((plan.data as JsonObject).deletedCandidates?.includes("old/secret.txt"), false);
+
+  const mirrored = await pushTool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot,
+    mode: "full",
+    mirrorDelete: true,
+    stateDir
+  });
+  assert.equal(mirrored.ok, true);
+  assert.equal(calls.some(call => call.toolName === "file.device.operation"), false);
+  assert.deepEqual(transferSummaryOf(mirrored.data as JsonObject).excludedDirectories, ["old"]);
+
+  const key = createHash("sha256").update(localRoot + "|device-1|" + remoteRoot).digest("hex").slice(0, 32);
+  const baseline = JSON.parse(await readFile(join(stateDir, "project-sync", key + ".json"), "utf8")) as {
+    files: Record<string, unknown>;
+  };
+  assert.ok(baseline.files["old/secret.txt"]);
+});
+
+test("mirrorDelete 仍删除普通未忽略的旧基线路径", async () => {
+  const localRoot = tempProjectRoot("mirror-normal-delete");
+  const stateDir = tempProjectRoot("mirror-normal-delete-state");
+  const remoteRoot = "/sdcard/appSync/mirror-normal-delete";
+  await createProjectFiles(localRoot, {
+    "project.json": "{}",
+    "removed/old.txt": "remove me"
+  });
+  const calls: JsonObject[] = [];
+  const ctx = projectContext(calls, () => ({ ok: true, code: "OK", message: "OK", data: { taskId: "delete" } }));
+  const tool = buildProjectTools(ctx).find(item => item.name === "project_sync_push");
+  assert.ok(tool);
+
+  const initial = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot,
+    mode: "full",
+    stateDir
+  });
+  assert.equal(initial.ok, true);
+  await unlink(join(localRoot, "removed", "old.txt"));
+
+  const mirrored = await tool.handler({
+    localRoot,
+    deviceId: "device-1",
+    remoteRoot,
+    mode: "full",
+    mirrorDelete: true,
+    stateDir
+  });
+  assert.equal(mirrored.ok, true);
+  const removals = calls.filter(call => call.toolName === "file.device.operation");
+  assert.equal(removals.length, 1);
+  assert.equal(removals[0].params?.operation, "DELETE");
+  assert.equal(removals[0].params?.path, remoteRoot + "/removed/old.txt");
+
+  const key = createHash("sha256").update(localRoot + "|device-1|" + remoteRoot).digest("hex").slice(0, 32);
+  const baseline = JSON.parse(await readFile(join(stateDir, "project-sync", key + ".json"), "utf8")) as {
+    files: Record<string, unknown>;
+  };
+  assert.equal(baseline.files["removed/old.txt"], undefined);
+});
+
+test("同步工具描述说明根 .hzignore、排除合并和传输摘要", () => {
+  const ctx = projectContext([], () => ({ ok: true, code: "OK", message: "OK", data: {} }));
+  for (const name of ["project_sync_plan", "project_sync_push"]) {
+    const tool = buildProjectTools(ctx).find(item => item.name === name);
+    assert.ok(tool);
+    const description = String(tool.description || "");
+    assert.match(description, /\.hzignore/);
+    assert.match(description, /根目录/);
+    assert.match(description, /默认排除/);
+    assert.match(description, /合并/);
+    assert.match(description, /transferSummary/);
+    assert.match(description, /totalBytes/);
+    assert.match(description, /excludedDirectories/);
+    assert.doesNotMatch(description, /ignoredFileCount/);
+  }
 });
 
 test("project_run reads project.json from device before submitting RUN_PROJECT", async () => {
