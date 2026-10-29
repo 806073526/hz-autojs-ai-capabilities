@@ -3,7 +3,7 @@
  * Evidence capture helper for hz-autojs-task-explorer.
  *
  * Drives the device MCP over stdio and persists the raw exploration evidence:
- * the decoded screenshot bytes, the OCR result, the raw tool metadata, and a
+ * the decoded screenshot bytes, the raw tool metadata, and a
  * hash-stamped entry in manifest.json.
  *
  * Screenshots default to JPEG q85: a full-resolution PNG frame is 2-3 MB and,
@@ -18,8 +18,6 @@
  *   --state <STATE_ID>     state label stored with the record
  *   --note <text>          free-form note stored with the record
  *   --region x1,y1,x2,y2   capture only this region
- *   --ocr                  also run device_ocr and save anchors
- *   --ocr-context <text>   target text hint for OCR
  *   --wait-stable          wait for a stable frame (skip during animation)
  *   --format <png|jpg>     preview format written to disk (default: jpg)
  *   --quality <1-100>      jpeg quality for --format jpg (default: 85)
@@ -65,7 +63,6 @@ if (!SETTINGS.device || !SETTINGS.run || !SETTINGS.label) {
 
 const RUN_DIR = resolve(SETTINGS.run);
 const SHOT_DIR = join(RUN_DIR, "screenshots");
-const OCR_DIR = join(RUN_DIR, "ocr");
 const META_DIR = join(RUN_DIR, "meta");
 const MANIFEST_PATH = join(RUN_DIR, "manifest.json");
 const MCP_ROOT = resolveMcpRoot(SETTINGS.mcpRoot);
@@ -76,7 +73,7 @@ if (!existsSync(ENTRY)) {
   process.exit(2);
 }
 
-for (const dir of [SHOT_DIR, OCR_DIR, META_DIR]) {
+for (const dir of [SHOT_DIR, META_DIR]) {
   mkdirSync(dir, { recursive: true });
 }
 
@@ -223,14 +220,8 @@ function parseArgs(argv) {
       case "--region":
         settings.region = argv[++index];
         break;
-      case "--ocr-context":
-        settings.ocrContext = argv[++index];
-        break;
       case "--mcp-root":
         settings.mcpRoot = argv[++index];
-        break;
-      case "--ocr":
-        settings.ocr = true;
         break;
       case "--wait-stable":
         settings.waitStable = true;
@@ -472,7 +463,7 @@ function runExportIndex() {
     schemaVersion: 1,
     runId: manifest.runId || basenameOf(runDir),
     exportedAt: new Date().toISOString(),
-    note: "由 manifest.json 派生的可提交索引；原始截图与 OCR 全文留在 data/exploration/<runId>/，不进版本库。",
+    note: "由 manifest.json 派生的可提交索引；原始截图与工具返回留在 data/exploration/<runId>/，不进版本库。",
     device: manifest.device || {},
     app: manifest.app || {},
     records: (manifest.records || []).map((record) => ({
@@ -484,7 +475,6 @@ function runExportIndex() {
       imported: record.imported === true ? true : undefined,
       originalName: record.originalName || undefined,
       screenshot: record.screenshot || null,
-      ocrAnchors: record.ocr?.anchors || undefined,
     })),
   };
   const output = resolve(SETTINGS.exportIndex);
@@ -560,26 +550,6 @@ async function main() {
       directControlMode: status.directControlMode,
     };
 
-    let ocrRecord;
-    if (SETTINGS.ocr) {
-      const ocrArgs = { deviceId: SETTINGS.device };
-      if (SETTINGS.ocrContext) ocrArgs.context = SETTINGS.ocrContext;
-      if (region) {
-        ocrArgs.x1 = region[0];
-        ocrArgs.y1 = region[1];
-        ocrArgs.x2 = region[2];
-        ocrArgs.y2 = region[3];
-      }
-      const ocrResult = await client.call("device_ocr", ocrArgs);
-      const ocrPayload = parseJsonText(ocrResult.texts) || { raw: ocrResult.texts };
-      const ocrName = `${padded}-${label}.json`;
-      writeFileSync(join(OCR_DIR, ocrName), `${JSON.stringify(ocrPayload, null, 2)}\n`, "utf8");
-      ocrRecord = {
-        file: `ocr/${ocrName}`,
-        anchors: extractAnchors(ocrPayload),
-      };
-    }
-
     const hash = hashFile(shotPath);
     const record = {
       seq,
@@ -596,7 +566,6 @@ async function main() {
         region: region || null,
       },
       meta: { file: `meta/${metaName}` },
-      ocr: ocrRecord || null,
       device: {
         screenWidth: resolution.screenWidth,
         screenHeight: resolution.screenHeight,
@@ -625,7 +594,6 @@ async function main() {
         format: screenshotFormat.format,
         quality: screenshotFormat.quality ?? null,
         warning: sizeWarning,
-        ocr: ocrRecord ? ocrRecord.anchors : null,
         manifest: "manifest.json",
       }),
     );
@@ -633,23 +601,6 @@ async function main() {
     client.stop();
     await sleep(50);
   }
-}
-
-function extractAnchors(payload) {
-  const texts = [];
-  const walk = (node) => {
-    if (Array.isArray(node)) {
-      for (const item of node) walk(item);
-      return;
-    }
-    if (!node || typeof node !== "object") return;
-    if (typeof node.text === "string" && node.text.trim()) texts.push(node.text.trim());
-    for (const value of Object.values(node)) {
-      if (value && typeof value === "object") walk(value);
-    }
-  };
-  walk(payload);
-  return [...new Set(texts)].slice(0, 40);
 }
 
 main().catch((error) => {

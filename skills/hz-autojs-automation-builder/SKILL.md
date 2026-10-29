@@ -7,6 +7,8 @@ description: 消费 hz-autojs-task-explorer 产出的 project-request.json、sta
 
 `hz-autojs-task-explorer` 负责**发现与验证**，本技能负责**编译与固化**。本技能把探索结论编译成独立项目，稳定运行期不再依赖逐帧 AI 决策。
 
+涉及目标设备的生成、运行和诊断时，[手机本地操作记忆](../hz-autojs-device-memory/SKILL.md) 只在重复失败、复用同版本同页面经验或核对已知反例时按需读取；稳定生成与执行不得依赖记忆，已验证的绕过经验再主动写回手机。
+
 ## 定位与边界
 
 - **只消费契约，不重新探索**：输入是 `project-request.json`、`state-model.json`、坐标契约和证据索引。契约里没有的事实，回到 `hz-autojs-task-explorer` 补证据，不在生成期猜。

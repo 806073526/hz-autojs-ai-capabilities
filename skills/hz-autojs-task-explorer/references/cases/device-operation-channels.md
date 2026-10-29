@@ -20,7 +20,7 @@
 
 ### 操作类原生工具需要按需加载
 
-会话里最初可能只注册了部分观察类工具（`device_find_text`、`device_ocr`、`device_logs`、`task_logs`、`page_match`）。操作类工具（`device_tap`、`device_swipe`、`device_screenshot`、`device_run_script_text`、`device_find_node`）需要先用工具检索按名称加载，之后即可原生调用。
+会话里最初可能只注册了部分观察类工具（`device_screenshot`、`device_layout_dump`、`device_find_node`、`device_logs`、`task_logs`）。操作类工具（`device_tap`、`device_swipe`、`device_input_text`、`device_tap_target`、`device_run_script_text`）需要先用工具检索按名称加载，之后即可原生调用。
 
 **不要因为第一眼没看到操作类工具就切到兜底通道。** 先检索一次；确认确实缺失或调用失败，再使用 `mcp-call.mjs`。
 
@@ -34,8 +34,7 @@ device_list  device_status  device_screenshot  device_layout_dump
 device_tap  device_swipe  device_input_text  device_logs
 device_run_script_text  device_run_script_file  device_stop_script
 task_get  task_wait  task_logs
-device_find_node  device_click_node  device_find_text  device_image_match
-device_color_pick  device_ocr  page_match
+device_find_node  device_click_node  device_tap_target
 ```
 
 ## 截图落盘陷阱
@@ -66,5 +65,5 @@ node capture.mjs <deviceId> <outFile>
 ## 动作验证原则
 
 - `success=true` 只代表事件下发成功，不代表界面已响应。
-- 每次关键动作后必须用 OCR / 截图 / 节点复核目标状态锚点。
+- 每次关键动作后必须用截图或节点复核目标状态锚点；`device_tap_target` 的 `TAP_*` 是点击动作，不是只读识别。
 - 连续两次点击后状态锚点不变，应停止重试并升级恢复手段。

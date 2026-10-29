@@ -7,6 +7,8 @@ description: 为华仔 AutoJs 工具箱 V5 生成、提交、调试或解释 Aut
 
 为华仔 AutoJs 工具箱 V5 生成、提交、调试或解释 AutoJs 脚本时使用本技能。
 
+涉及目标设备的编写、运行或排障时，[手机本地操作记忆](../hz-autojs-device-memory/SKILL.md) 只在重复失败、复用同版本同页面经验或核对已知反例时按需读取；稳定执行不得强制先读，验证出有效经验后再主动写回。
+
 ## 必要上下文
 
 - V5 mobile 脚本通过 V5 Java 后端任务系统下发，并在 V5 APP 的 AutoJs 运行时执行。

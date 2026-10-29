@@ -86,7 +86,7 @@ mcp/src/
     └── tools/
 ```
 
-入口差异验收必须同时满足：设备入口仍为现有 21 个设备、控制、识别、脚本和任务工具（另有 2 个本地 AutoJs 文档索引工具和 3 个知识库只读工具，都不经设备任务链路）；项目入口只注册项目工具，不出现 `device_list`、`device_status`；两个入口不重复注册同一工具，也不通过跨 MCP 调用补足设备上下文。
+入口差异验收必须同时满足：设备入口为现有 17 个设备、控制、统一纯图色、脚本和任务工具（另有 2 个本地 AutoJs 文档索引工具和 3 个知识库只读工具，都不经设备任务链路）；项目入口只注册项目工具，不出现 `device_list`、`device_status`；两个入口不重复注册同一工具，也不通过跨 MCP 调用补足设备上下文。
 
 ## 设备 MCP
 
@@ -99,7 +99,7 @@ mcp/src/
 | 设备与状态 | `device_list`、`device_status`、`device_screenshot`、`device_logs` |
 | 布局与节点 | `device_layout_dump`、`device_find_node`、`device_click_node` |
 | 控制 | `device_tap`、`device_swipe`、`device_input_text` |
-| 识别 | `device_find_text`、`device_ocr`、`device_image_match`、`device_color_pick`、`page_match` |
+| 统一纯图色 | `device_tap_target`：创建/验证图片与色组素材，按素材或 OCR 文字点击，并支持最多 20 步连续点击 |
 | 脚本 | `device_run_script_text`、`device_run_script_file`、`device_stop_script` |
 | 任务 | `task_get`、`task_wait`、`task_logs` |
 | 知识库（只读） | `knowledge_search`、`knowledge_read`、`knowledge_assets`，检索官方知识包与客户资料，取图可回传 image 块 |
@@ -170,7 +170,7 @@ skill 和 MCP 的启停仍由客户端配置分别控制。安装文档必须把
 
 | 范围 | 当前基线 | 对改造的影响 |
 | --- | --- | --- |
-| 设备 MCP 工具数 | 21 个设备/任务工具 + 2 个 AutoJs 文档索引工具 | 抽取核心和建立双入口时保持原有 21 个的名称、schema 和行为不变 |
+| 设备 MCP 工具数 | 17 个设备/任务工具 + 2 个 AutoJs 文档索引工具 + 3 个知识库只读工具 | 旧分工具视觉入口已收敛为 `device_tap_target`，其余设备工具保持名称、schema 和行为不变 |
 | 设备授权时长 | 普通访问令牌为 2 小时，MCP grant 为 30 分钟 | 改为两个系统参数后默认值均为 2 小时；已签发记录保留原 `expiresAt`，只影响后续签发 |
 | 设备文件访问 | `file.device.*` 当前只检查 `deviceAccessTokens` | 必须复用共享设备访问判定，并接受同一设备的设备级 MCP grant |
 | 项目配置回写 | 公共/Web 来源当前已解析同一 `project.json`，保存时写回该路径并更新 `fileSize/fileHash/fileType/updatedAt` | 不得重复新造脱钩副本；只补齐实际缺失的项目元数据与行为验证 |

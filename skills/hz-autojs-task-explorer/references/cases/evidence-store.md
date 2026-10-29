@@ -1,6 +1,6 @@
 # 探索证据库
 
-探索的产出不能只有结论。本案例规定原始数据（截图、OCR、工具返回）怎么落盘、怎么索引、怎么校验，以及哪些内容允许进入版本库。
+探索的产出不能只有结论。本案例规定原始截图与工具返回怎么落盘、怎么索引、怎么校验，以及哪些内容允许进入版本库。
 
 ## 目录结构
 
@@ -8,7 +8,6 @@
 data/exploration/<runId>/
   manifest.json          唯一索引，每条记录带 sha256 与字节数
   screenshots/NNN-<label>.jpg（默认；`--format png` 时为 .png）
-  ocr/NNN-<label>.json   device_ocr 原始返回
   meta/NNN-<label>.json  device_screenshot 工具原始返回
 ```
 
@@ -18,13 +17,13 @@ data/exploration/<runId>/
 
 1. 关键状态必须有当次截图，不允许事后补描述。
 2. 每条截图记录写入 `sha256` 与字节数，整理后仍可证明文件未被替换。
-3. 图片、日志、临时截图不进版本库；版本库只提交状态、时间、哈希和 OCR 锚点摘要。
+3. 图片、日志、临时截图不进版本库；版本库只提交状态、时间、哈希和可复核的文本摘要。
 
 这条边界同时满足两个约束：探索需要原始数据可复查，仓库又禁止提交运行数据与截图。
 
 ## 工具
 
-- `assets/tools/capture-evidence.mjs`：采一张当前画面，落盘截图（默认 JPEG q85，`--format png` 可保留无损原图）、元数据、可选 OCR，并追加清单记录。
+- `assets/tools/capture-evidence.mjs`：采一张当前画面，落盘截图（默认 JPEG q85，`--format png` 可保留无损原图）与工具元数据，并追加清单记录。
 - `assets/tools/import-screenshots.mjs`：把此前散落在临时目录的截图批量归档，按 sha256 去重。
 - `capture-evidence.mjs --verify`：重算已有记录的 sha256 与字节数。
 
@@ -36,7 +35,7 @@ data/exploration/<runId>/
 {"run":"dupo-cangqiong-20261001","ok":33,"bad":0,"records":33}
 ```
 
-实时采集样本（`REALM_PANEL`，境界面板引导前往 1-7）：
+历史实时采集样本（`REALM_PANEL`，境界面板引导前往 1-7；其中的 `ocr` 字段只代表当时的旧工具结果）：
 
 ```text
 {"ok":true,"seq":2,"screenshot":"screenshots/002-realm-panel-1-7-prompt.png",
@@ -56,7 +55,7 @@ data/exploration/<runId>/
 
 证据库服务闭环第 7 步（证据固化）和第 8 步（复跑验证）：
 
-- 固化：每个状态至少一张截图 + 一次 OCR，坐标标定有来源图。
-- 复跑：复跑结果作为新记录追加，与旧记录按 `label` / `state` 对比锚点和数值，而不是覆盖历史。
+- 固化：每个关键状态至少一张截图；坐标或视觉素材标定必须有来源图。新证据不依赖只读 OCR，需要 OCR 点击时由 `device_tap_target` 的动作结果另记。
+- 复跑：复跑结果作为新记录追加，与旧记录按 `label` / `state` 对比截图和动作结果，而不是覆盖历史。
 
 无法复跑的案例要在 `findings.md` 里显式标成缺口，不能靠一张截图就声明流程可用。

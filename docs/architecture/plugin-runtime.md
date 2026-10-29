@@ -35,8 +35,10 @@
 - `mcp/src/authoring/`：作者工具 MCP 入口与教程录制工具（默认关闭，开启后注册 10 个录制工具）。
 - `.mcp.json`、`.claude.mcp.json` 与 `mcp/workbuddy.mcp.json` 同时声明 `hz-autojs-device-mcp`、`hz-autojs-project-mcp` 和 `hz-autojs-authoring-mcp`。
 
-设备入口在原有 21 个设备工具之外，另注册 2 个不依赖 V5 的 AutoJs 文档索引工具（`autojs_docs_search`、`autojs_docs_read`）与 3 个知识库只读工具（`knowledge_search`、`knowledge_read`、`knowledge_assets`）；原有 21 个工具的名称、schema 和行为不变，且不包含项目同步、设备文件管理或 APK 安装。
+设备入口共注册 22 个工具：17 个设备/任务工具（含统一纯图色操作 `device_tap_target`），加 2 个不依赖 V5 的 AutoJs 文档索引工具（`autojs_docs_search`、`autojs_docs_read`）与 3 个知识库只读工具（`knowledge_search`、`knowledge_read`、`knowledge_assets`）；该入口不包含项目同步、设备文件管理或 APK 安装。
 项目入口不复制 `device_list` 和 `device_status`，也不跨 MCP 调用另一个 server 的工具。三个入口的工具名不重复。
+
+[手机本地操作记忆技能](../../skills/hz-autojs-device-memory/SKILL.md) 作为可选技能随插件分发，既有设备任务技能也显式引用它；MCP 初始化不额外注入正文。客户端技能目录只提供摘要和触发条件，只有重复失败、复用同版本同页面经验或核对已知反例时才按需读取正文及模板。稳定执行不得依赖先读记忆；验证出有效经验后，才读取或更新目标手机 `/sdcard/appSync/memory/index.md` 与命中条目的 `SKILL.md`。读取与写入沿用项目 MCP 的设备文件工具、设备访问和商业授权，不新增工具或服务端记忆存储。
 
 ## 客户端清单与市场
 

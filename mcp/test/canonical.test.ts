@@ -47,7 +47,7 @@ function toolContext(config: AppConfig, calls: JsonObject[] = [], outcome?: Tool
           ok: true,
           code: "OK",
           message: "OK",
-          data: { taskId: `task-${toolName}`, taskMode: "RUN_SCRIPT_TEXT" }
+          data: { result: { taskId: `task-${toolName}`, taskMode: "RUN_SCRIPT_TEXT" } }
         };
       },
       waitForTask: async taskId => ({
@@ -93,6 +93,229 @@ test("snake_case MCP device_tap maps to V5 canonical execute endpoint", async ()
       permissionMode: "FULL_AUTO"
     }
   }]);
+});
+
+test("device_tap_target maps every unified vision operation to the canonical contract", async () => {
+  const calls: JsonObject[] = [];
+  const ctx = toolContext(baseConfig(), calls);
+  const tool = findTool(ctx, "device_tap_target");
+  const cases: Array<{ args: JsonObject; expected: JsonObject }> = [
+    {
+      args: {
+        operation: "CREATE_IMAGE",
+        name: "button",
+        region: { x: 10, y: 20, width: 100, height: 50 },
+        threshold: 0.9
+      },
+      expected: {
+        deviceId: "device-1",
+        operation: "CREATE_IMAGE",
+        name: "button",
+        region: { x: 10, y: 20, width: 100, height: 50 },
+        threshold: 0.9
+      }
+    },
+    {
+      args: {
+        operation: "CREATE_COLOR_GROUP",
+        name: "dots",
+        points: [
+          { x: 10, y: 20, color: "#112233" },
+          { x: 30, y: 40, color: "#445566" }
+        ]
+      },
+      expected: {
+        deviceId: "device-1",
+        operation: "CREATE_COLOR_GROUP",
+        name: "dots",
+        points: [
+          { x: 10, y: 20, color: "#112233" },
+          { x: 30, y: 40, color: "#445566" }
+        ]
+      }
+    },
+    {
+      args: { operation: "TAP_IMAGE", name: "button", region: { x: 0, y: 0, width: 80, height: 40 } },
+      expected: {
+        deviceId: "device-1",
+        operation: "TAP_IMAGE",
+        name: "button",
+        region: { x: 0, y: 0, width: 80, height: 40 }
+      }
+    },
+    {
+      args: { operation: "TAP_COLOR_GROUP", name: "dots", threshold: 120 },
+      expected: { deviceId: "device-1", operation: "TAP_COLOR_GROUP", name: "dots", threshold: 120 }
+    },
+    {
+      args: {
+        operation: "TAP_TEXT",
+        text: "设置",
+        region: { x: 0, y: 0, width: 1080, height: 2400 },
+        ocrEngine: "paddle"
+      },
+      expected: {
+        deviceId: "device-1",
+        operation: "TAP_TEXT",
+        text: "设置",
+        region: { x: 0, y: 0, width: 1080, height: 2400 },
+        ocrEngine: "paddle"
+      }
+    },
+    {
+      args: {
+        operation: "RUN_SEQUENCE",
+        steps: [
+          { operation: "TAP_IMAGE", name: "button" },
+          { operation: "TAP_TEXT", text: "设置", region: { x: 0, y: 0, width: 1080, height: 2400 } }
+        ]
+      },
+      expected: {
+        deviceId: "device-1",
+        operation: "RUN_SEQUENCE",
+        steps: [
+          { operation: "TAP_IMAGE", name: "button" },
+          { operation: "TAP_TEXT", text: "设置", region: { x: 0, y: 0, width: 1080, height: 2400 } }
+        ]
+      }
+    },
+    {
+      args: { operation: "SET_STATUS", name: "dots", status: "verified" },
+      expected: { deviceId: "device-1", operation: "SET_STATUS", name: "dots", status: "verified" }
+    }
+  ];
+
+  for (const item of cases) {
+    const result = await tool.handler({
+      deviceId: "device-1",
+      waitForResult: false,
+      ...item.args
+    });
+    assert.equal(result.ok, true, String(item.args.operation));
+  }
+
+  assert.deepEqual(calls, cases.map(item => ({
+    toolName: "device.vision.tapTarget",
+    params: item.expected,
+    options: { permissionMode: "FULL_AUTO" }
+  })));
+});
+
+test("device_tap_target waits on the nested canonical taskId", async () => {
+  const waited: string[] = [];
+  const ctx = toolContext(baseConfig(), [], {
+    ok: true,
+    code: "OK",
+    message: "任务已提交",
+    data: {
+      status: "SUCCEEDED",
+      result: {
+        status: "success",
+        result: { taskId: "task-nested-vision" }
+      }
+    }
+  });
+  ctx.client.waitForTask = async taskId => {
+    waited.push(taskId);
+    return {
+      ok: true,
+      code: "OK",
+      message: "任务完成",
+      data: {
+        taskId,
+        taskStatus: "SUCCEEDED",
+        taskMode: "TOOL_VISION_TAP_TARGET",
+        raw: {}
+      }
+    };
+  };
+
+  const result = await findTool(ctx, "device_tap_target").handler({
+    deviceId: "device-1",
+    operation: "SET_STATUS",
+    name: "button",
+    status: "verified"
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(waited, ["task-nested-vision"]);
+});
+
+test("device_tap_target does not report success when a submitted task has no taskId", async () => {
+  let waited = 0;
+  const ctx = toolContext(baseConfig(), [], {
+    ok: true,
+    code: "OK",
+    message: "任务已提交",
+    data: {
+      status: "SUCCEEDED",
+      result: {
+        status: "success",
+        result: { message: "未找到素材" }
+      }
+    }
+  });
+  ctx.client.waitForTask = async taskId => {
+    waited += 1;
+    return {
+      ok: true,
+      code: "OK",
+      message: "不应等待",
+      data: { taskId, taskStatus: "SUCCEEDED", raw: {} }
+    };
+  };
+
+  const result = await findTool(ctx, "device_tap_target").handler({
+    deviceId: "device-1",
+    operation: "SET_STATUS",
+    name: "__probe_nonexistent__",
+    status: "verified"
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "TASK_ID_MISSING");
+  assert.match(result.message, /taskId/);
+  assert.equal(waited, 0);
+});
+
+test("device_tap_target is blocked in read-only mode without submitting a task", async () => {
+  const calls: JsonObject[] = [];
+  const ctx = toolContext(baseConfig({ readOnly: true }), calls);
+
+  const result = await findTool(ctx, "device_tap_target").handler({
+    deviceId: "device-1",
+    operation: "TAP_TEXT",
+    text: "设置",
+    waitForResult: false
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "READ_ONLY");
+  assert.equal(calls.length, 0);
+});
+
+test("device_tap_target rejects operation-incompatible and nested-sequence arguments before submitting", async () => {
+  const calls: JsonObject[] = [];
+  const ctx = toolContext(baseConfig(), calls);
+  const tool = findTool(ctx, "device_tap_target");
+  const invalidCases: JsonObject[] = [
+    { operation: "TAP_TEXT", text: "设置", threshold: 0.8 },
+    { operation: "TAP_IMAGE", name: "button", targetPath: "/sdcard/button.png" },
+    { operation: "RUN_SEQUENCE", steps: [{ operation: "RUN_SEQUENCE" }] },
+    { operation: "CREATE_IMAGE", name: "button", region: { x: 0.5, y: 0, width: 10, height: 10 } },
+    { operation: "CREATE_COLOR_GROUP", name: "dots", points: [{ x: 1, y: 2 }] }
+  ];
+
+  for (const invalid of invalidCases) {
+    const result = await tool.handler({
+      deviceId: "device-1",
+      waitForResult: false,
+      ...invalid
+    });
+    assert.equal(result.ok, false, String(invalid.operation));
+    assert.equal(result.code, "INVALID_ARGUMENT", String(invalid.operation));
+  }
+  assert.equal(calls.length, 0);
 });
 
 test("read-only MCP mode blocks control tools but still allows canonical screenshot", async () => {
@@ -715,7 +938,7 @@ test("V5 canonical execute returns FULL_AUTO_DENIED as structured MCP error", as
   } finally {
     globalThis.fetch = originalFetch;
   }
-
+});
 
 test("V5 task wait surfaces terminalSource so script success can be attributed", async () => {
   const originalFetch = globalThis.fetch;
@@ -765,5 +988,4 @@ test("V5 task wait surfaces watchdog attribution on failure", async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
-});
 });

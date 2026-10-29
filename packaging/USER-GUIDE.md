@@ -1,6 +1,6 @@
 # 华仔 AutoJs AI 能力包（安装与使用）
 
-本包为 Codex、Claude Code、ZCode 与 WorkBuddy 提供“华仔 AutoJs 工具箱 V5”的 6 个技能与 3 个 MCP 服务：设备通道（26 个工具，含 2 个 AutoJs 离线文档索引工具与 3 个知识库只读工具）、项目开发通道（16 个工具）与作者工具通道（教程录制，默认关闭，开启后 12 个工具）。本包已在 Codex 侧完成装机验收；WorkBuddy 5.8.2 已在本机完成「本地目录市场 → 安装插件 → 三个 MCP 随插件注册并拉起进程」验证（GUI 登录会话里的原生工具调用待复核，见「WorkBuddy（桌面端）」）；通用模式已在豆包完成技能与 stdio MCP 接入验证。Claude Code 与 ZCode 侧仍未随包验证。
+本包为 Codex、Claude Code、ZCode 与 WorkBuddy 提供“华仔 AutoJs 工具箱 V5”的 7 个技能与 3 个 MCP 服务：设备通道（22 个工具，含 2 个 AutoJs 离线文档索引工具与 3 个知识库只读工具）、项目开发通道（16 个工具）与作者工具通道（教程录制，默认关闭，开启后 12 个工具）。本包已在 Codex 侧完成装机验收；WorkBuddy 5.8.2 已在本机完成「本地目录市场 → 安装插件 → 三个 MCP 随插件注册并拉起进程」验证（GUI 登录会话里的原生工具调用待复核，见「WorkBuddy（桌面端）」）；通用模式已在豆包完成技能与 stdio MCP 接入验证。Claude Code 与 ZCode 侧仍未随包验证。
 
 技能与 MCP 的定义本身不绑定任何客户端：Codex、Claude Code、ZCode、WorkBuddy 都直接读包内各自的插件清单，装上即带技能与 MCP；其余能接入技能（`SKILL.md` 形式）并配置 stdio MCP 服务的工具（例如豆包）按「通用插件模式」自行接入。注意：MCP 的“验证”指客户端把它注册进自己的 MCP 列表、并在新会话里出现原生工具，不等于“进程能启动”或“兜底通道能调用”；各客户端的注册位置见「通用插件模式」的「各客户端 MCP 注册位置」表。
 
@@ -69,8 +69,8 @@ codex plugin marketplace remove hz-autojs-local
 
 1. 保持解压目录不变（与 Codex 使用同一份，例如 `%USERPROFILE%\.codex\plugin-sources\hz-autojs-ai-capabilities\<版本>\`）。
 2. 打开 ZCode，进入 设置 → 插件，点右上角「创建」→「添加插件市场」，来源选择本地目录（选择上面的解压目录）。
-3. 在「个人」分段找到「华仔 AutoJs AI 能力包」，点「安装」并保持启用。启用后 6 个技能与 3 个 MCP 服务会注册到当前工作台。
-4. 新开任务验证：技能出现 `hz-autojs-device-operator`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer` 六项；MCP 设置里出现三个 server（命名空间 `plugin:hz-autojs-ai-capabilities:`）；可先做一次只读的 `device_list` 调用确认链路。
+3. 在「个人」分段找到「华仔 AutoJs AI 能力包」，点「安装」并保持启用。启用后 7 个技能与 3 个 MCP 服务会注册到当前工作台。
+4. 新开任务验证：技能出现 `hz-autojs-device-operator`、`hz-autojs-device-memory`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer` 七项；MCP 设置里出现三个 server（命名空间 `plugin:hz-autojs-ai-capabilities:`）；可先做一次只读的 `device_list` 调用确认链路。
 5. 升级：解压新版本目录后，在 ZCode 的市场源面板移除旧市场源，再添加新目录并重新安装。不要覆盖旧目录，与 Codex 的「新目录 + 重新注册」口径一致。
 
 配置与 Codex 共用同一份用户级 `config.env`（见「配置参数」），不通过 ZCode 插件配置界面填写。
@@ -90,7 +90,7 @@ ZCode 有与界面同源的插件 CLI（`zcode plugins`），ZCode 任务里的 
 
 ## WorkBuddy（桌面端）
 
-包内提供 WorkBuddy 插件清单 `.workbuddy-plugin/plugin.json`（`skills` 指向 `./skills/`，`mcpServers` 指向 `./mcp/workbuddy.mcp.json`）与本地市场清单 `.workbuddy-plugin/marketplace.json`（市场名与 Codex 一致，条目 `source` 为 `"."`）。装上插件即同时获得 6 个技能与 3 个 MCP，MCP 由插件清单直接注册，不需要再手写用户级 `~/.workbuddy/mcp.json`。
+包内提供 WorkBuddy 插件清单 `.workbuddy-plugin/plugin.json`（`skills` 指向 `./skills/`，`mcpServers` 指向 `./mcp/workbuddy.mcp.json`）与本地市场清单 `.workbuddy-plugin/marketplace.json`（市场名与 Codex 一致，条目 `source` 为 `"."`）。装上插件即同时获得 7 个技能与 3 个 MCP，MCP 由插件清单直接注册，不需要再手写用户级 `~/.workbuddy/mcp.json`。
 
 1. 保持解压目录不变（与 Codex 共用同一份，例如 `%USERPROFILE%\.codex\plugin-sources\hz-autojs-ai-capabilities\<版本>\`）。
 2. 在 WorkBuddy 里添加本地市场并安装：侧边栏「插件」→ 添加市场（来源选本地目录，指向上面的解压目录）→ 找到「华仔 AutoJs AI 能力包」→ 安装并保持启用。
@@ -117,7 +117,7 @@ GUI 与 CLI 读写同一份 `~/.workbuddy` 安装记录，任选一种即可；C
 
 ## 包内内容
 
-- `skills\`：设备操作、AutoJs 脚本编写、项目开发、任务探索、自动化项目生成、检测模型训练六个技能。
+- `skills\`：设备操作、手机本地操作记忆、AutoJs 脚本编写、项目开发、任务探索、自动化项目生成、检测模型训练七个技能。
 - `mcp\dist\`、`mcp\node_modules\`：三个 MCP 的可执行入口与生产依赖，安装后无需再执行 `npm install`。
 - `mcp\docs\autojs-index.json`：随包 AutoJs API 索引，供 `autojs_docs_search` / `autojs_docs_read` 使用；另外四份 `.md` 是技能正文引用的说明（设备执行模式、确认与设备访问、兜底通道、响应裁剪）。
 - `config.env.example`：用户级配置模板（中文注释、含全部参数与默认值），`mcp-config.mjs init` 以它为准。
@@ -155,14 +155,14 @@ Codex、Claude Code、ZCode、WorkBuddy 各有自己的章节与随包清单，�
 - 默认路径（推荐）：随包装插件。WorkBuddy 按 `.codebuddy-plugin` → `.workbuddy-plugin` → `.claude-plugin` 的顺序找插件清单（`marketplace.json` / `plugin.json`），本包提供 `.workbuddy-plugin\plugin.json` 与 `.workbuddy-plugin\marketplace.json`；MCP 配置在 `mcp\workbuddy.mcp.json`，三个 server 都用 `command: node`、`args: ${CODEBUDDY_PLUGIN_ROOT}/mcp/dist/<通道>/index.js`、`cwd: ${CODEBUDDY_PLUGIN_ROOT}`，WorkBuddy 在加载插件时自动注册，不用手工写配置文件。
 - 手工回退（不装插件时）：用户级 `%USERPROFILE%\.workbuddy\mcp.json`（Windows）/ `$HOME/.workbuddy/mcp.json`，或项目级 `<项目目录>\.workbuddy\mcp.json`，结构为 `{"mcpServers": { ... }}`。官方界面入口：侧边栏「插件」→「MCP 服务器」→「配置 MCP」，保存后查看状态灯（🟢 连接成功 / 🔴 配置异常）。
 - `~/.workbuddy/mcp.json` 是**全局共享**文件（你的其他 MCP 也在里面）：写入前先读取现有内容，只新增/更新本插件的三个键，**不要整体覆盖**；每个 server 用 `command` / `args` / `cwd` / `env`，路径写解压目录的**绝对路径**，写入后在 MCP 管理界面确认启用（Trust），必要时重启 WorkBuddy。
-- 三个通道的工具数应为 device **26** / project **16** / authoring **1**（作者工具默认关闭；开启后 12）。数量对不上即说明注册未生效。
+- 三个通道的工具数应为 device **22** / project **16** / authoring **1**（作者工具默认关闭；开启后 12）。数量对不上即说明注册未生效。
 - 官方文档：<https://www.workbuddy.ai/docs/zh/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/MCP-Guide>。
 
 ### 交给 AI 配置（可直接复制）
 
-> 这个目录是「华仔 AutoJs AI 能力包」，为外部工具提供 6 个技能与 3 个 stdio MCP 服务。请按你所在客户端的方式接入，不要修改包内文件：
+> 这个目录是「华仔 AutoJs AI 能力包」，为外部工具提供 7 个技能与 3 个 stdio MCP 服务。请按你所在客户端的方式接入，不要修改包内文件：
 >
-> 1. 技能：`skills\` 下有 `hz-autojs-device-operator`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer` 六个 `SKILL.md`。注册到你的技能目录；如果支持指向外部目录，就直接指向本包的 `skills\`，不要再复制一份，避免以后升级时两处漂移。
+> 1. 技能：`skills\` 下有 `hz-autojs-device-operator`、`hz-autojs-device-memory`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer` 七个 `SKILL.md`。注册到你的技能目录；如果支持指向外部目录，就直接指向本包的 `skills\`，不要再复制一份，避免以后升级时两处漂移。
 > 2. MCP：**优先走客户端的插件机制**——Codex 用 `codex plugin marketplace add` + `plugin add`；WorkBuddy 添加本地目录市场后安装插件（插件清单自带 MCP：`.workbuddy-plugin\plugin.json` → `mcp\workbuddy.mcp.json`）。只有客户端不支持插件清单、必须手工接入时，才读包根 `.mcp.json`，把三个 server 转成该客户端的 MCP 配置格式写进它自己的 MCP 注册位置（WorkBuddy 手工回退为 `%USERPROFILE%\.workbuddy\mcp.json` 的 `mcpServers`，先读现有内容合并，只增改本插件三个键，不要覆盖其他 MCP）；其余客户端先核对它的注册位置与字段，不要凭猜测写入。启动命令是 `node`；参数里的相对路径换成解压目录的绝对路径；工作目录设为解压目录。
 > 3. 配置：执行 `node <解压目录>\mcp\tools\mcp-config.mjs init` 生成用户级配置，再执行 `node <解压目录>\mcp\tools\mcp-config.mjs show`，把脱敏后的结果贴回来。
 > 4. 验证（验收标准，缺一不可）：a) 客户端的 MCP 管理界面能看到 `hz-autojs-device-mcp`、`hz-autojs-project-mcp`、`hz-autojs-authoring-mcp` 三个条目；b) 新开的会话里工具列表出现 `mcp__hz-autojs-device-mcp__device_list` 等原生 MCP 工具（命名格式以客户端为准）；c) 用该原生工具成功调用一次 `device_list`。注意：**“MCP 进程能启动” ≠ “MCP 已被客户端注册”**——直接拉起进程、`tools/list` 返回正常或改用兜底直连，都不等于注册通过；a / b 不满足时不得报告“安装完成”，要说明卡在哪一步。
@@ -174,7 +174,7 @@ Codex、Claude Code、ZCode、WorkBuddy 各有自己的章节与随包清单，�
 
 | server | 启动命令 | 工具数 | 需要的环境变量 |
 | --- | --- | --- | --- |
-| `hz-autojs-device-mcp` | `node <解压目录>\mcp\dist\device\index.js` | 26 | 无 |
+| `hz-autojs-device-mcp` | `node <解压目录>\mcp\dist\device\index.js` | 22 | 无 |
 | `hz-autojs-project-mcp` | `node <解压目录>\mcp\dist\project\index.js` | 16 | `HZ_MCP_CLIENT_ID=hz-autojs-project-mcp` |
 | `hz-autojs-authoring-mcp` | `node <解压目录>\mcp\dist\authoring\index.js` | 1（默认）/ 12（开启） | `HZ_MCP_CLIENT_ID=hz-autojs-authoring-mcp` |
 

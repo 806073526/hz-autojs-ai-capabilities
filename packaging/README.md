@@ -20,7 +20,7 @@
 | `mcp/workbuddy.mcp.json` | WorkBuddy 侧三个 MCP 入口；用 `${CODEBUDDY_PLUGIN_ROOT}` 绝对化入口路径与工作目录。WorkBuddy 引擎除清单 `mcpServers` 外还会扫描插件内 `mcp/*.json`，本文件按文件名序最后加载，覆盖根 `.mcp.json` 的相对路径版本（放插件根反而会被覆盖，故不提供根级 `.workbuddy.mcp.json`） |
 | `.claude-plugin/plugin.json`、`.claude.mcp.json` | Claude Code 插件清单与 MCP 启动入口；`.claude.mcp.json` 用 `${CLAUDE_PLUGIN_ROOT}` 绝对化入口路径，同时被 ZCode 清单引用 |
 | `.claude-plugin/marketplace.json` | ZCode 与 Claude Code 共用的本地市场清单；条目 `source` 为 `"."`，把解压目录自身解析为插件根 |
-| `skills/**` | 仅装配正式六项技能（设备操作、脚本编写、项目开发、任务探索、自动化项目生成、检测模型训练）；按正式技能白名单逐目录复制，不复制整个 `skills/` 目录 |
+| `skills/**` | 仅装配正式七项技能（设备操作、手机本地操作记忆、脚本编写、项目开发、任务探索、自动化项目生成、检测模型训练）；按正式技能白名单逐目录复制，不复制整个 `skills/` 目录 |
 
 | `mcp/dist/**` | 已编译的 stdio 入口，用户不需要 TypeScript 工具链 |
 | `mcp/node_modules/**` | 运行时依赖（`@modelcontextprotocol/sdk`、`dotenv`），裁剪为生产依赖 |
@@ -101,7 +101,7 @@ hz_autojs_toolbox_ai_capabilities/
 
 ## 验收门禁
 
-`-VerifyInstall` 验收的是“装配产物能不能装、能不能起 tool 列表”：解压目录注册市场、安装插件、注册 MCP、三个入口 `tools/list`（设备 26 / 项目 16 / 作者 1，开启后 12），结果写进 release manifest。它只覆盖 Codex 侧装机；ZCode 与 WorkBuddy 是 GUI 客户端，装机验收需在客户端内执行（步骤见 [安装与验证](../docs/runbooks/install-and-verify.md) 与用户指南），打包脚本对它们只做静态校验：四个客户端 manifest 版本一致、市场条目 `source` 为 `"."` 且版本一致、ZCode 清单引用 `./.claude.mcp.json`、WorkBuddy 清单引用 `./mcp/workbuddy.mcp.json`。`-VerifyInstall` 不能替代真实 V5 与设备的端到端调用；真实调用按 [安装与验证](../docs/runbooks/install-and-verify.md) 的最小真实闭环执行，并在 `docs/planning/current-status.md` 写明未覆盖项。
+`-VerifyInstall` 验收的是“装配产物能不能装、能不能起 tool 列表”：解压目录注册市场、安装插件、注册 MCP、三个入口 `tools/list`（设备 22 / 项目 16 / 作者 1，开启后 12），结果写进 release manifest。它只覆盖 Codex 侧装机；ZCode 与 WorkBuddy 是 GUI 客户端，装机验收需在客户端内执行（步骤见 [安装与验证](../docs/runbooks/install-and-verify.md) 与用户指南），打包脚本对它们只做静态校验：四个客户端 manifest 版本一致、市场条目 `source` 为 `"."` 且版本一致、ZCode 清单引用 `./.claude.mcp.json`、WorkBuddy 清单引用 `./mcp/workbuddy.mcp.json`。`-VerifyInstall` 不能替代真实 V5 与设备的端到端调用；真实调用按 [安装与验证](../docs/runbooks/install-and-verify.md) 的最小真实闭环执行，并在 `docs/planning/current-status.md` 写明未覆盖项。
 
 ## 版本更新与重装
 

@@ -311,10 +311,38 @@ export function optionalObject(args: JsonObject, name: string): JsonObject | und
   return value as JsonObject;
 }
 
+/**
+ * 从 canonical 提交结果里提取 taskId。
+ *
+ * V5 的真实返回通常再包一层 `result`（例如
+ * `{ status: "success", result: { taskId } }`），不能只检查顶层字段。
+ * 这里按广度优先查找第一个非空 `taskId`，既兼容现有直接返回，也兼容额外的
+ * `data` / `resultJson` 容器。
+ */
 export function taskIdFromSubmitResult(data: unknown): string | undefined {
-  if (!data || typeof data !== "object" || Array.isArray(data)) return undefined;
-  const value = (data as Record<string, unknown>).taskId;
-  return typeof value === "string" && value ? value : undefined;
+  if (!data) return undefined;
+  const queue: unknown[] = [data];
+  const visited = new Set<object>();
+  for (let index = 0; index < queue.length && index < 100; index++) {
+    const value = queue[index];
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      if (Array.isArray(value)) {
+        for (const item of value) queue.push(item);
+      }
+      continue;
+    }
+    if (visited.has(value)) continue;
+    visited.add(value);
+    const record = value as Record<string, unknown>;
+    const taskId = record.taskId;
+    if (typeof taskId === "string" && taskId.trim()) {
+      return taskId.trim();
+    }
+    for (const key of ["result", "data", "resultJson"]) {
+      if (record[key] !== undefined) queue.push(record[key]);
+    }
+  }
+  return undefined;
 }
 
 export async function maybeWaitForTask(
@@ -324,9 +352,16 @@ export async function maybeWaitForTask(
   shapeOptions: TaskResponseShapeOptions = {}
 ): Promise<ToolOutcome> {
   const waitForResult = optionalBoolean(args, "waitForResult", true);
-  const taskId = taskIdFromSubmitResult(submitData);
-  if (!waitForResult || !taskId) {
+  if (!waitForResult) {
     return ok("任务已提交", submitData);
+  }
+  const taskId = taskIdFromSubmitResult(submitData);
+  if (!taskId) {
+    return fail(
+      "TASK_ID_MISSING",
+      "任务提交结果未返回 taskId，无法确认执行结果；已停止等待，不视为成功",
+      submitData
+    );
   }
   const result = await ctx.client.waitForTask(taskId, {
     timeoutMs: optionalNumber(args, "timeoutMs"),

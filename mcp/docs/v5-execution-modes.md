@@ -148,7 +148,7 @@ if (!result || result.success !== true) {
 - **固化脚本**：长脚本先 `device_file_write_text` 写到设备，再 `device_run_script_file` 运行。文件通道与文本通道共用同一包装（心跳、终态上报、错误文本），正常结束同样是 `SUCCEEDED` + `CHILD_ENGINE`，相对 `require` 按脚本所在目录解析。
 - **稳定帧**：`device_screenshot` 传 `waitStable:true`（`waitStableTimeoutMs` 默认 6000、`waitStableIntervalMs` 默认 700、`stableThreshold` 默认 8）时，设备端连续采样比对，稳定或超时后返回最后一帧，结果 payload 带 `stableWait` 报告。
 - **黑帧自检**：截图疑似纯黑时 payload 返回 `suspectedBlackFrame=true`、`reasonCode=SCREEN_CAPTURE_BLACK_FRAME_SUSPECTED` 和 `hint`；根因通常是脚本内 `images.requestScreenCapture()` 抢占 MediaProjection，恢复用 `resetScreenCapture:true`。
-- **OCR 区域**：`device_ocr` 支持 `x1/y1/x2/y2` 与 `detectRotation`，优先只识别 HUD 或目标区域。
+- **统一纯图色**：`device_tap_target` 通过 `TAP_TEXT` 识别并点击文字，或用 `TAP_IMAGE` / `TAP_COLOR_GROUP` 点击本机已验证素材；`region` 应尽量缩小到目标区域。该工具会执行点击，只读模式会直接拒绝，不能用作只读 OCR 或探针。
 - **任务查询**：`task_wait` / `task_logs` 允许携带 `deviceId`（仅用于上下文，不参与查询）；`task_logs` 的 `tailLines` 可直接裁剪尾部。
 
 ## 脚本终态、心跳与父引擎看护
@@ -191,7 +191,7 @@ V5 的脚本类任务（`RUN_SCRIPT_TEXT` / `RUN_SCRIPT_FILE` / `RUN_PROJECT` / 
 | 分级 | 覆盖任务 | 静默阈值 | 总时长硬上限 |
 | --- | --- | --- | --- |
 | 即时型 | `TOOL_LAYOUT_DUMP` `FILE_LIST` `FILE_OPERATION` `DEVICE_CONFIG_SYNC` `STOP_SCRIPT_ENGINES` 日志类 `APP_DIAGNOSTICS` `RUN_SHELL` | 90 秒 | 3 分钟 |
-| 图色型 | `TOOL_SCREENSHOT_CAPTURE` `TOOL_IMAGE_PROCESS` `TOOL_IMAGE_MATCH` `TOOL_IMAGE_OCR` `STREAM_REFRESH_CAPTURE` | 150 秒 | 5 分钟 |
+| 图色型 | `TOOL_SCREENSHOT_CAPTURE` `TOOL_IMAGE_PROCESS` `TOOL_IMAGE_MATCH` `TOOL_IMAGE_OCR` `TOOL_VISION_TAP_TARGET` `STREAM_REFRESH_CAPTURE` | 150 秒 | 5 分钟 |
 | 脚本型 | `RUN_SCRIPT_TEXT` `RUN_SCRIPT_FILE` `SCRIPT_CONTENT` `SCRIPT_PATH` | 180 秒 | 6 分钟 |
 | 项目型 | `RUN_PROJECT` | 10 分钟 | 20 分钟 |
 | 传输型 | `FILE_PUSH` `FILE_PULL` `APP_PACKAGE_INSTALL` `DEVICE_APK_INSTALL` `APK_METADATA_READ` | 15 分钟 | 45 分钟 |

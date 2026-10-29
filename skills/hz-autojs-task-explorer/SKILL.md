@@ -7,6 +7,8 @@ description: 把未知 Android 应用或游戏任务探索成可复用的领域�
 
 当任务目标已知、但页面流程、状态、锚点和可执行动作尚未摸清时使用本技能。它不替代设备操作、脚本编写或项目部署技能，而是在三者之上规定探索顺序、证据格式和交接产物。
 
+[手机本地操作记忆](../hz-autojs-device-memory/SKILL.md) 只在重复失败、复用同版本同页面经验或核对已知反例时按需读取，不是设备探索的启动步骤；稳定执行直接依据当前页面证据，验证出新经验后再主动写回手机。
+
 ## 定位与边界
 
 - 本技能负责把未知任务变成可验证的领域技能和可固化脚本，不负责长期运行时逐帧决策。
@@ -36,7 +38,7 @@ description: 把未知 Android 应用或游戏任务探索成可复用的领域�
 ## 探索闭环
 
 1. 任务界定：记录目标、成功条件、禁止动作、目标设备、目标应用和允许的风控边界。
-2. 环境侦察：`device_status`、`device_screenshot`、`device_ocr`、`device_layout_dump`（结构分析口径：`layoutRange: "all"`、`limit: 0`、`visibleOnly: false`），确认包名、Activity、方向、截图链路、节点树可用性和执行模式。
+2. 环境侦察：`device_status`、`device_screenshot`、`device_layout_dump`（结构分析口径：`layoutRange: "all"`、`limit: 0`、`visibleOnly: false`），确认包名、Activity、方向、截图链路、节点树可用性和执行模式。当前没有只读 OCR / 图像匹配 MCP 入口，证据采集不得调用会点击的 `device_tap_target`。
 3. 状态建模：把页面拆成可识别状态，记录进入条件、可观察锚点、可执行动作、退出条件和失败恢复。
 4. 目标选择：优先选无支付风险、可重复、反馈明确的动作；跳过购买、账号变更、删除、授权变更等高风险动作。
 5. 探针实验：一次只改一个变量，记录起止画面、OCR 结果、坐标来源、耗时和返回值。
@@ -59,7 +61,6 @@ data/exploration/<runId>/
   evidence/
     manifest.json        证据索引：每条含时间、状态、文件、字节数、sha256、OCR 锚点
     screenshots/         原始截图（默认 jpg/q85，--format png 可无损；本地留存，不进版本库）
-    ocr/                 device_ocr 原始返回
     meta/                device_screenshot 工具原始返回
   probes/
   runs/
@@ -127,9 +128,9 @@ data/exploration/<runId>/
 
 探索必须留下原始数据，而不只是结论。四条硬规则：
 
-1. **原始优先**：状态判断的每个关键节点都要有当次截图，而不是事后凭记忆补描述。截图与 OCR 原始返回一并保留。
+1. **原始优先**：状态判断的每个关键节点都要有当次截图，而不是事后凭记忆补描述。截图与工具元数据一并保留。
 2. **哈希可校验**：每条截图记录写入 `sha256` 与字节数，任何后续整理都能证明文件未被替换。
-3. **二进制不进版本库**：截图、日志属于运行数据，写入 `data/exploration/<runId>/`；版本库只提交由清单派生的文本索引（状态、时间、sha256、OCR 锚点摘要）。
+3. **二进制不进版本库**：截图、日志属于运行数据，写入 `data/exploration/<runId>/`；版本库只提交由清单派生的文本索引（状态、时间、sha256 与可复核摘要）。
 4. **按用途选格式**：当前操作要用颜色（取色、图色匹配、颜色阈值、写进脚本的颜色参数）→ `--format png`，无损、颜色准确；只是识别页面上有什么内容、记录步骤或留痕复查 → 默认 `jpg`（q85，同屏约为 PNG 的 1/8，想更省用 `--quality 60`）。同一批证据可以混用：取色图用 PNG，过程留痕用 JPG。
 
 ### 采集与校验工具
@@ -137,9 +138,9 @@ data/exploration/<runId>/
 宿主侧工具位于 `assets/tools/`，直接通过 stdio 驱动设备 MCP，不占用脚本引擎的截图通道。
 
 ```powershell
-# 采一张：落盘截图（默认 jpg/q85）+ 工具元数据 + 可选 OCR，并追加 manifest 记录
+# 采一张：落盘截图（默认 jpg/q85）+ 工具元数据，并追加 manifest 记录
 node assets/tools/capture-evidence.mjs --device <deviceId> --run data/exploration/<runId> `
-  --label <短标签> --state <状态ID> --ocr --note "<说明>"
+  --label <短标签> --state <状态ID> --note "<说明>"
 
 # 这一张要用来取色/做颜色判断：改用 PNG 无损
 node assets/tools/capture-evidence.mjs --device <deviceId> --run data/exploration/<runId> `
@@ -160,8 +161,8 @@ node assets/tools/capture-evidence.mjs --run data/exploration/<runId> --verify
 
 - `capturedAt` / `label` / `state` / `note`：何时、何状态、何说明。
 - `screenshot.file` / `bytes` / `sha256`：截图相对路径、字节数、哈希。
-- `ocr.anchors`：本次识别到的文本锚点摘要；原始返回在 `ocr/`。
 - `device` / `app`：分辨率、直控模式、包名、Activity，供多分辨率与版本比对。
+  历史运行目录可能保留旧版 `ocr/` 数据作为既有证据，但新采集不再生成该目录。
 
 ### 截图链路事实
 
@@ -283,11 +284,10 @@ node assets/tools/capture-evidence.mjs --run data/exploration/<runId> --verify
 原生设备 MCP 可直接调用的操作类工具（优先用这些，不要先写兜底命令）：
 
 ```text
-观察：device_screenshot  device_ocr  device_find_text  device_find_node
-      device_layout_dump  device_image_match  device_color_pick  page_match
-操作：device_tap  device_swipe  device_input_text  device_click_node
+观察：device_screenshot  device_find_node  device_layout_dump  device_logs
+操作：device_tap  device_swipe  device_input_text  device_click_node  device_tap_target
 脚本：device_run_script_text  device_run_script_file  device_stop_script
-任务：task_get  task_wait  task_logs  device_logs
+任务：task_get  task_wait  task_logs
 ```
 
 截图核对直接用 `device_screenshot` 的 `includePreview`；需要长按、拖动换位、批量步骤时用 `device_run_script_text` 配合 `__toolboxLongPress` / `__toolboxSwipe` / `__toolboxTap`，并写日志 marker。
@@ -313,7 +313,7 @@ node assets/tools/capture-evidence.mjs --run data/exploration/<runId> --verify
 
 ## 观察与动作规范
 
-- 优先使用布局节点；节点不可用时使用 `device_ocr`、`device_image_match` 或图色探针。
+- 优先使用布局节点；节点不可用时用 `device_screenshot` 观察画面。只有已经决定点击、且需要 OCR/图片/色组定位时才使用 `device_tap_target`；它属于操作工具，只读模式会拒绝，不能拿来做只读识别或证据采集。
 - 截图统一由宿主 `device_screenshot` 生成；需要宿主可视化时用 `includePreview`，脚本只读设备侧落盘文件。禁止脚本内调用 `images.requestScreenCapture()`，它会抢占截图通道导致黑帧。
 - 任何点击前必须说明坐标来源；坐标只能来自 `anchor` / `edge` / `ratio` 三种契约，禁止直接写裸像素。
 - 禁止用缩放预览图估算坐标；预览图只用于状态判断，不用于标定。

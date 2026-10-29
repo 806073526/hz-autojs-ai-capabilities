@@ -1,11 +1,13 @@
 ---
 name: hz-autojs-device-operator
-description: 通过华仔 AutoJs 工具箱 V5 MCP 工具操作 Android 设备。用于 AI 需要列出设备、截图观察、读取布局节点、做页面结构分析、查找节点、点击、滑动、输入、OCR、图像匹配，或验证远程设备操作结果时。
+description: 通过华仔 AutoJs 工具箱 V5 MCP 工具操作 Android 设备。用于 AI 需要列出设备、截图观察、读取布局节点、做页面结构分析、查找节点、点击、滑动、输入、使用统一纯图色入口，或验证远程设备操作结果时。
 ---
 
 # hz-autojs-device-operator
 
 通过华仔 AutoJs 工具箱 V5 MCP 工具操作 Android 设备时使用本技能。
+
+[手机本地操作记忆](../hz-autojs-device-memory/SKILL.md) 是可选的重复失败排查辅助，不是设备任务的启动步骤；只有需要复用同版本、同页面经验或核对已知反例时才按需读取。稳定执行不得依赖记忆。
 
 ## 操作顺序
 
@@ -15,7 +17,7 @@ description: 通过华仔 AutoJs 工具箱 V5 MCP 工具操作 Android 设备。
 4. 优先使用节点操作；在裸坐标前先尝试 `device_find_node` 或 `device_click_node`。
 5. 验证新增、编辑、删除、保存等维护入口时，若文本节点没找到入口，二次读布局并开 `includeActionCandidates=true`（或 `candidateOnly=true`），检查图标型候选。
 6. 节点明显过少、为空或与截图不一致时，先核对采集口径是否被过滤或截断：结构分析口径应为 `layoutRange: "all"`、`limit: 0`、`visibleOnly: false`、`dedupe: false`，并检查返回里的 `layoutSummary.truncated`。
-7. 当全部窗口布局仍不完整或不可用时，再使用 `device_ocr` 或 `device_image_match`。
+7. 当全部窗口布局仍不完整或不可用时，先用 `device_screenshot` 判断画面；需要 OCR、图片或色组点击时使用统一入口 `device_tap_target`。该工具会执行点击，只读模式会拒绝，不能当作只读识别工具。
 8. 只有在目标状态明确后，才使用 `device_tap`、`device_swipe` 或 `device_input_text`。
 9. 每次操作后都再次调用 `device_screenshot`，确认页面结果。
 10. 用户只要求「写脚本并运行 / 远程执行脚本」时，直接用 `device_run_script_text` 提交或在单控页用 `page.remoteScript.runCurrent` 执行；**不要先调 `page.remoteScript.readEditor` / `page.fileEditor.readEditor`**——读编辑器只在需要改现有内容或用户明确指向编辑器内容时才用。
@@ -39,7 +41,7 @@ description: 通过华仔 AutoJs 工具箱 V5 MCP 工具操作 Android 设备。
 ## 动作优先级
 
 - 优先使用稳定布局字段，例如 `id`、精确 `text`、`desc`/`contentDescription`、`className`。
-- 其次使用 `textContains`、OCR、页面匹配、图像匹配、颜色锚点。
+- 其次使用 `textContains`；节点不可用且目标只存在于画面时，使用 `device_tap_target` 的 `TAP_TEXT`、`TAP_IMAGE` 或 `TAP_COLOR_GROUP`。
 - 最后才使用最近一次截图或布局边界推导出的裸坐标。
 - 提取菜单或入口列表时，不要只看 `text`；很多 App 会把可见标题放在 `desc`/`contentDescription` 中。
 - 判断维护入口时，不要只看文字型按钮；图标型编辑/删除/更多操作应优先看 `actionCandidates` 中的 `nearbyText`、`parentText`、`zone`、`reason` 和 `center`，必要时再截图确认。
@@ -47,7 +49,9 @@ description: 通过华仔 AutoJs 工具箱 V5 MCP 工具操作 Android 设备。
 ## 图色与截图任务
 
 - 页面刚加载/切换时截图会拿到**过渡帧**。`device_screenshot` 支持 `waitStable=true`：设备端按 `waitStableIntervalMs`（默认 700ms）连续比对采样像素，稳定或 `waitStableTimeoutMs`（默认 6000ms）超时后返回最后一帧；结果 payload 的 `stableWait` 给出 `stable` / `attempts` / `diff` / `timedOut`。用它替代硬编码 `sleep` 猜加载时间。
-- 读取 canvas 绘制的 HUD（倒计时、分数）用 `device_ocr`；支持 `x1/y1/x2/y2` 只识别目标区域，以及 `detectRotation`。区域越小越稳也越快。
+- 纯图色只有 `device_tap_target` 一个公开入口，操作类型为 `CREATE_IMAGE`、`CREATE_COLOR_GROUP`、`TAP_IMAGE`、`TAP_COLOR_GROUP`、`TAP_TEXT`、`RUN_SEQUENCE`、`SET_STATUS`。`TAP_TEXT` 会识别并点击文字；`TAP_IMAGE` / `TAP_COLOR_GROUP` 会点击本机素材，二者都必须先用 `device_screenshot` 和动作结果确认目标。
+- 素材固定保存在设备 `/sdcard/appSync/hz_autojs_toolbox_v5_vision/`。新建素材为 `candidate`，不能直接取用；只有实际命中并验证点击效果后才可用 `SET_STATUS` 标为 `verified`。包名、应用版本、分辨率或素材 SHA-256 任一不匹配，以及素材缺失、过期、退役或命中多个位置时，操作都必须停机，不能猜点。
+- `RUN_SEQUENCE` 最多 20 步，只允许 `TAP_IMAGE` / `TAP_COLOR_GROUP` / `TAP_TEXT`；每步重新取帧，任一步失败即停止。不要用连续步骤跨越登录、验证码、支付、授权确认或需要人工判断的分支。
 - **按用途选截图格式**：当前操作要用颜色（取色、图色匹配、颜色阈值、写进脚本的颜色参数）→ `previewFormat: "png"`，无损、颜色准确；只是为了识别页面上有什么内容、记录步骤或留痕复查 → `previewFormat: "jpg"`（可用 `previewQuality` 调小），体积小得多。图片一旦进入会话，之后每一轮请求都会带着它重发，所以别把"只看一眼"的图存成 PNG。
 - 截图 payload 出现 `suspectedBlackFrame=true` / `reasonCode=SCREEN_CAPTURE_BLACK_FRAME_SUSPECTED` 时，说明截图通道被脚本内 `images.requestScreenCapture()` 抢占（症状是约 12KB 的纯黑帧，屏幕上看不出异常）。改用 `device_screenshot` 的 `outputPath` 落盘、脚本用 `images.read()` 读取；必要时用 `resetScreenCapture:true` 恢复通道。
 - 长脚本先 `device_file_write_text` 固化到设备，再用 `device_run_script_file` 直接运行，不要再写“一行 eval”。需要变参时用 `device_run_script_text` 的 `scriptParams`（脚本内读 `__toolboxParams`），不要用字符串替换注入。

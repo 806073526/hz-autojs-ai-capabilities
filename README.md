@@ -56,10 +56,12 @@ npm run build
 - `.workbuddy-plugin/`、`mcp/workbuddy.mcp.json`：WorkBuddy 插件清单、本地市场清单与 MCP 启动入口；用 `${CODEBUDDY_PLUGIN_ROOT}` 绝对化入口路径。该 MCP 文件必须留在 `mcp/` 目录：WorkBuddy 引擎会扫描插件内 `mcp/*.json`，靠它覆盖插件根 `.mcp.json` 的同名 server（覆盖顺序：清单 mcpServers → `.mcp.json` → `mcp/*.json`）。
 - `mcp/`：TypeScript MCP Server、测试、随包 AutoJs 离线文档与符号级索引；`mcp/src/core/` 为双入口共用核心。
 - `mcp/docs/autojs-index.json`：从离线文档蒸馏的符号级索引，供 device MCP 与 V5 AI 工作台共用。
-- `skills/`：设备操作、AutoJs 脚本编写、项目开发部署、任务探索、自动化项目生成和检测模型训练技能。
+- `skills/`：设备操作、手机本地操作记忆、AutoJs 脚本编写、项目开发部署、任务探索、自动化项目生成和检测模型训练技能。
 - `examples/`：独立 MCP 与 marketplace 配置示例。
 
 设备 MCP 与项目开发 MCP 是两个独立 server，skill 与 MCP 也是两个独立开关：启用 skill 不会自动启用 MCP。
+
+[手机本地操作记忆](skills/hz-autojs-device-memory/SKILL.md) 作为正式技能随插件分发，由客户端技能目录和设备端技能目录发现，命中设备任务后再按需读取。执行任务的 AI 先读 `/sdcard/appSync/memory/index.md` 的简短摘要，命中后才读取详情；绕过问题并验证有效后，主动总结写回同一手机。MCP 初始化不额外注入其正文。
 
 构建、安装、缓存和实时工具验证是不同环节。修改本目录中的源码或文档，不代表已重新安装插件或更新当前 AI 会话；完整判定方法见[安装与验证](docs/runbooks/install-and-verify.md)。
 

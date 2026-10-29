@@ -5,8 +5,8 @@ import type { JsonObject, ToolContext, ToolOutcome } from "../src/core/types.ts"
 import { buildTools } from "../src/device/tools/index.ts";
 import { buildProjectTools } from "../src/project/tools/index.ts";
 
-// 21 个设备/任务工具 + 2 个 AutoJs 文档索引工具 + 3 个知识库只读工具
-const DEVICE_TOOL_COUNT = 26;
+// 17 个设备/任务工具 + 2 个 AutoJs 文档索引工具 + 3 个知识库只读工具
+const DEVICE_TOOL_COUNT = 22;
 
 const EXPECTED_DEVICE_TOOLS = [
   // AutoJs 离线文档索引：脚本编写前确认 API 存在性的唯一入口
@@ -25,11 +25,7 @@ const EXPECTED_DEVICE_TOOLS = [
   "device_tap",
   "device_swipe",
   "device_input_text",
-  "device_find_text",
-  "device_ocr",
-  "device_image_match",
-  "device_color_pick",
-  "page_match",
+  "device_tap_target",
   "device_run_script_text",
   "device_run_script_file",
   "device_stop_script",
@@ -107,7 +103,7 @@ function toolContext(): ToolContext {
   };
 }
 
-test("device entry keeps the 21 device tools plus 2 docs tools plus 3 knowledge tools with unchanged names", () => {
+test("device entry keeps the 17 device tools plus 2 docs tools plus 3 knowledge tools with unchanged names", () => {
   const names = buildTools(toolContext()).map(tool => tool.name);
   assert.equal(names.length, DEVICE_TOOL_COUNT, `设备入口工具数量应为 ${DEVICE_TOOL_COUNT}`);
   assert.deepEqual([...names].sort(), [...EXPECTED_DEVICE_TOOLS].sort());

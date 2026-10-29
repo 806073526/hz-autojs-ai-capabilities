@@ -8,14 +8,16 @@
 - V5 执行模式：`AUTO`
 - 主链路：设备 MCP `mcp__hz_autojs_device_mcp__*`
 
-## 已验证工具
+## 历史已验证工具
 
 - `device_screenshot`：可用；带 `includePreview` 时可直接观察画面。
-- `device_ocr`：可用；能返回精确 bounds。
+- `device_ocr`：记录时可用；当前源码已退役该只读入口。需要 OCR 点击时改用 `device_tap_target` 的 `TAP_TEXT`，并先确认它属于操作动作。
 - `device_tap`：可用；坐标需按真实截图或 OCR 校正。
 - `device_run_script_text`：可用；`__toolboxTap` 和 `__toolboxAction` 正常执行。
 - `device_layout_dump`：在该游戏上不可用，节点树不能作为主方案。
 - ADB：只在本案例中用于 root 环境确认和兜底启动，不作为正式 MCP 主链路。
+
+本节的工具名是当时证据，不代表当前工具面；当前纯图色入口只有 `device_tap_target`。
 
 ## 状态链
 

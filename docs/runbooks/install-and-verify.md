@@ -63,7 +63,7 @@ ZCode 没有稳定的命令行装机验收入口，按以下步骤在客户端�
 
 1. 设置 → 插件 → 创建 → 添加插件市场，来源选择本包解压目录（市场清单 `.claude-plugin/marketplace.json` 的条目 `source` 为 `"."`，指向目录自身）。
 2. 安装 `hz-autojs-ai-capabilities` 并启用。
-3. 核对六个技能注册到「Plugin 技能」：`hz-autojs-device-operator`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer`。
+3. 核对七个技能注册到「Plugin 技能」：`hz-autojs-device-operator`、`hz-autojs-device-memory`、`hz-autojs-script-author`、`hz-autojs-project-developer`、`hz-autojs-task-explorer`、`hz-autojs-automation-builder`、`hz-autojs-detect-trainer`。
 4. 核对 MCP 设置中出现三个 server（命名空间 `plugin:hz-autojs-ai-capabilities:`）：`hz-autojs-device-mcp`、`hz-autojs-project-mcp`、`hz-autojs-authoring-mcp`，入口指向插件根 `mcp/dist/{device,project,authoring}/index.js`。
 5. 以新任务执行一次只读 `device_list`；V5 条件不具备时停在工具列表验证，并把真实调用记为缺口。
 
@@ -105,7 +105,7 @@ node "$cache\mcp\dist\authoring\index.js"
 
 按 MCP stdio 协议发送 `initialize`、`notifications/initialized` 和 `tools/list`，核对：
 
-- 设备入口返回 26 个工具：原有 21 个设备/任务工具，加 2 个 AutoJs 文档索引工具 `autojs_docs_search`、`autojs_docs_read`，加 3 个知识库只读工具 `knowledge_search`、`knowledge_read`、`knowledge_assets`（检索官方知识包与客户资料，直接调用 V5 的 `/api/mcp/knowledge/**`，不占用设备）。
+- 设备入口返回 22 个工具：17 个设备/任务工具（含统一纯图色操作 `device_tap_target`），加 2 个 AutoJs 文档索引工具 `autojs_docs_search`、`autojs_docs_read`，加 3 个知识库只读工具 `knowledge_search`、`knowledge_read`、`knowledge_assets`（检索官方知识包与客户资料，直接调用 V5 的 `/api/mcp/knowledge/**`，不占用设备）。
 - 项目入口返回 16 个工具：`device_file_list`、`device_file_read_text`、`device_file_write_text`、`device_file_push`、`device_file_pull`、`device_file_operation`、`project_sync_plan`、`project_sync_push`、`project_sync_status`、`project_run`、`project_dependencies_status`、`project_install_dependencies`、`project_build`、`project_apk_install`、`project_deploy_status`、`project_task_logs`。
 - 项目入口不包含 `device_list` 和 `device_status`。
 - 作者工具入口默认只返回 1 个工具 `tutorial_authoring_status`；带 `HZ_MCP_ENABLE_TUTORIAL_TOOLS=true` 启动时返回 12 个工具（`tutorial_session_create` / `tutorial_session_update` / `tutorial_session_list` / `tutorial_session_delete` / `tutorial_mobile_preview` / `tutorial_mobile_step` / `tutorial_desktop_step` / `tutorial_step_update` / `tutorial_step_delete` / `tutorial_session_review` / `tutorial_session_publish` 加状态工具），关闭时录制类工具不得出现在列表里。

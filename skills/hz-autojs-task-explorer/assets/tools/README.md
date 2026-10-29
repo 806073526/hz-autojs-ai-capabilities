@@ -4,7 +4,7 @@
 
 ## capture-evidence.mjs
 
-采集一张当前画面，落盘截图（默认 JPEG q85，可用 `--format png` 保留无损原图）、工具返回元数据、可选 OCR 结果，并向 `manifest.json` 追加一条带 sha256 的记录。
+采集一张当前画面，落盘截图（默认 JPEG q85，可用 `--format png` 保留无损原图）与工具返回元数据，并向 `manifest.json` 追加一条带 sha256 的记录。当前没有只读 OCR / 图像匹配 MCP 入口，本工具不会调用会点击的 `device_tap_target`。
 
 ```powershell
 node capture-evidence.mjs `
@@ -12,7 +12,6 @@ node capture-evidence.mjs `
   --run <运行目录> `
   --label <短标签> `
   --state <状态ID> `
-  --ocr `
   --note "<说明>"
 ```
 
@@ -29,7 +28,7 @@ node capture-evidence.mjs `
 输出示例：
 
 ```json
-{"ok":true,"run":"dupo-cangqiong-20261001","seq":2,"screenshot":"screenshots/002-realm-panel-1-7-prompt.jpg","bytes":297589,"sha256":"3056...","format":"jpg","quality":85,"ocr":["斗气:12318","前往"],"manifest":"manifest.json"}
+{"ok":true,"run":"dupo-cangqiong-20261001","seq":2,"screenshot":"screenshots/002-realm-panel-1-7-prompt.jpg","bytes":297589,"sha256":"3056...","format":"jpg","quality":85,"manifest":"manifest.json"}
 ```
 
 ## import-screenshots.mjs
@@ -45,13 +44,12 @@ node import-screenshots.mjs --run <运行目录> --source <旧截图目录> --st
 
 ## export-evidence-index.mjs
 
-把运行目录 `manifest.json` 里的记录导出/合并成可进版本库的文本证据索引（`evidence-index.json`）：只保留状态、时间、sha256 与 OCR 锚点摘要，截图二进制仍留在本地。
+把运行目录 `manifest.json` 里的记录导出/合并成可进版本库的文本证据索引（`evidence-index.json`）：只保留状态、时间、sha256 与可复核摘要，截图二进制仍留在本地。历史清单里的旧 `ocr.anchors` 可继续导出为历史 `ocrAnchors`，新采集不再生成该字段。
 
 ```powershell
 node export-evidence-index.mjs `
   --run <运行目录> `
-  --out <索引文件，例如插件仓库的 references/runs/<runId>/evidence-index.json> `
-  --anchors 40
+  --out <索引文件，例如插件仓库的 references/runs/<runId>/evidence-index.json>
 ```
 
 - 不传 `--out` 时默认写到 `<运行目录>/evidence-index.json`。
@@ -84,11 +82,10 @@ node refresh-agent-brief.mjs --run <运行目录>
 data/exploration/<runId>/
   manifest.json
   screenshots/   原始截图（默认 .jpg，--format png 时为 .png）
-  ocr/           OCR 原始返回
   meta/          截图工具原始返回
 ```
 
-版本库只提交由 `manifest.json` 派生出的索引（状态、时间、sha256、OCR 锚点摘要），不提交图片二进制。
+版本库只提交由 `manifest.json` 派生出的索引（状态、时间、sha256 与可复核摘要），不提交图片二进制。历史运行目录可能另有旧版 `ocr/`，仅作为历史证据保留。
 
 ## 校验
 

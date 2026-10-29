@@ -126,7 +126,7 @@
 
 - `device_tap`、`device_swipe`（换位）、`device_screenshot`（`includePreview` 直接看图）
 - `device_run_script_text`（长按、批量点击、日志 marker）
-- `device_find_text`、`device_ocr`（文本锚点与坐标校正）
+- 本记录形成时还使用 `device_find_text`、`device_ocr` 做文本锚点与坐标校正；这些旧入口已退役。当前源码使用 `device_tap_target` 的 `TAP_TEXT` 做 OCR 点击，并且必须先确认点击副作用。
 
 插件兜底调用器 `mcp-call.mjs` 只在原生工具未注册或缺失时使用。两者走同一套 V5 授权与风险判定。
 
